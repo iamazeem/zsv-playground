@@ -1,11 +1,14 @@
 package main
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/go-github/v60/github"
@@ -97,7 +100,7 @@ func downloadLatestRelease() error {
 				id := a.GetID()
 				size := a.GetSize()
 				fmt.Printf("checking %v [size: %v]\n", tag, size)
-				if cachedSize, ok := c[tag + ".tar.gz"]; ok && int64(size) == cachedSize {
+				if cachedSize, ok := c[tag+".tar.gz"]; ok && int64(size) == cachedSize {
 					fmt.Printf("%v found in cache, skipped\n", tag)
 				} else {
 					m[tag] = id
@@ -126,6 +129,62 @@ func downloadLatestRelease() error {
 		rc.Close()
 	}
 
+	fmt.Printf("extracting new archives [%v]\n", downloads)
+	for tag := range m {
+		filename := fmt.Sprintf("zsv/%v.tar.gz", tag)
+		file, err := os.Open(filename)
+		if err != nil {
+			fmt.Printf("failed to open archive [%v], %v\n", filename, err)
+		}
+		targetDir := filepath.Join(cacheDir, tag)
+		if err := untar(targetDir, file); err != nil {
+			fmt.Printf("failed to untar archive [%v], %v\n", filename, err)
+		}
+	}
+
 	fmt.Printf("cache populated successfully [downloads: %v]\n", downloads)
 	return nil
+}
+
+func untar(targetDir string, r io.Reader) error {
+	gzr, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
+
+	for {
+		header, err := tr.Next()
+		switch {
+		case err == io.EOF:
+			return nil
+		case err != nil:
+			return err
+		case header == nil:
+			continue
+		}
+
+		if strings.HasSuffix(header.Name, "bin/") || strings.HasSuffix(header.Name, "/bin/zsv") {
+			target := filepath.Join(targetDir, header.Name)
+			switch header.Typeflag {
+			case tar.TypeDir:
+				if _, err := os.Stat(target); err != nil {
+					if err := os.MkdirAll(target, 0755); err != nil {
+						return err
+					}
+				}
+			case tar.TypeReg:
+				f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+				if err != nil {
+					return err
+				}
+				if _, err := io.Copy(f, tr); err != nil {
+					return err
+				}
+				f.Close()
+			}
+		}
+	}
 }
