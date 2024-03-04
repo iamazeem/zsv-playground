@@ -36,14 +36,13 @@ func setupCache() bool {
 func loadCache() (map[string]int64, bool) {
 	fmt.Println("loading cache")
 
-	c := map[string]int64{}
-
 	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
 		fmt.Printf("error while reading cache directory, %v\n", err)
 		return nil, false
 	}
 
+	c := map[string]int64{}
 	for _, e := range entries {
 		name := e.Name()
 		info, err := e.Info()
@@ -51,11 +50,44 @@ func loadCache() (map[string]int64, bool) {
 			fmt.Printf("failed to get directory entry info [%v], %v\n", name, err)
 			return nil, false
 		}
-		c[name] = info.Size()
+		if mode := info.Mode(); mode.IsRegular() && strings.HasSuffix(name, archive) {
+			c[name] = info.Size()
+		}
 	}
 
-	fmt.Println("cache loaded successfully")
+	fmt.Printf("cache loaded successfully [%v]\n", len(c))
 	return c, true
+}
+
+func purgeCache(tags map[string]bool) bool {
+	fmt.Printf("purging cache\n")
+
+	entries, err := os.ReadDir(cacheDir)
+	if err != nil {
+		fmt.Printf("failed to read cache directory, %v\n", err)
+		return false
+	}
+
+	purgeList := []string{}
+	for _, e := range entries {
+		entryName := e.Name()
+		if _, ok := tags[entryName]; !ok {
+			purgeList = append(purgeList, entryName)
+		}
+	}
+
+	fmt.Printf("purge list: %v\n", purgeList)
+	for _, e := range purgeList {
+		p := filepath.Join(cacheDir, e)
+		if err := os.RemoveAll(p); err != nil {
+			fmt.Printf("failed to purge [%v]\n", p)
+		} else {
+			fmt.Printf("purged %v\n", p)
+		}
+	}
+
+	fmt.Printf("purged cache successfully [%v]\n", len(purgeList))
+	return true
 }
 
 func downloadLatestRelease() error {
@@ -72,27 +104,29 @@ func downloadLatestRelease() error {
 	client := github.NewClient(nil)
 	opts := &github.ListOptions{Page: 1, PerPage: 3}
 
-	fmt.Println("listing releases...")
+	fmt.Printf("checking releases\n")
 	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, opts)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	// TODO: Purge previous cached releases in case of new ones
-	// fmt.Println(len(releases))
+	tags := map[string]bool{}
 
 	// tag > id
 	m := map[string]int64{}
 
 	for _, r := range releases {
 		tag := r.GetTagName()
+		tarName := fmt.Sprintf("%v.%v", tag, archive)
+		tags[tag] = true
+		tags[tarName] = true
 		for _, a := range r.Assets {
 			if strings.HasSuffix(*a.Name, suffix) {
 				id := a.GetID()
 				size := a.GetSize()
 				fmt.Printf("checking %v [size: %v]\n", tag, size)
-				if cachedSize, ok := c[tag+".tar.gz"]; ok && int64(size) == cachedSize {
+				if cachedSize, ok := c[tarName]; ok && int64(size) == cachedSize {
 					fmt.Printf("%v found in cache, skipped\n", tag)
 				} else {
 					m[tag] = id
@@ -101,7 +135,6 @@ func downloadLatestRelease() error {
 		}
 	}
 
-	// fmt.Println(m)
 	downloads := 0
 	for tag, id := range m {
 		fmt.Printf("downloading %v [id: %v]\n", tag, id)
@@ -111,20 +144,19 @@ func downloadLatestRelease() error {
 			return err
 		}
 
-		filename := fmt.Sprintf("zsv/%v.tar.gz", tag)
+		filename := fmt.Sprintf("%v/%v.%v", cacheDir, tag, archive)
 		file, _ := os.Create(filename)
 		io.Copy(file, rc)
-
-		downloads++
-
 		file.Close()
 		rc.Close()
+
+		downloads++
 	}
 
 	fmt.Printf("extracting new archives [%v]\n", downloads)
 	for tag := range m {
 		fmt.Printf("extracting %v\n", tag)
-		filename := fmt.Sprintf("zsv/%v.tar.gz", tag)
+		filename := fmt.Sprintf("%v/%v.%v", cacheDir, tag, archive)
 		file, err := os.Open(filename)
 		if err != nil {
 			fmt.Printf("failed to open archive [%v], %v\n", filename, err)
@@ -133,6 +165,10 @@ func downloadLatestRelease() error {
 		if err := untar(targetDir, file); err != nil {
 			fmt.Printf("failed to untar archive [%v], %v\n", filename, err)
 		}
+	}
+
+	if !purgeCache(tags) {
+		fmt.Printf("failed to purge cache\n")
 	}
 
 	fmt.Printf("cache populated successfully [downloads: %v]\n", downloads)
