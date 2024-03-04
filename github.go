@@ -14,12 +14,6 @@ import (
 	"github.com/google/go-github/v60/github"
 )
 
-const (
-	owner    = "liquidaty"
-	repo     = "zsv"
-	cacheDir = "zsv"
-)
-
 func setupCache() bool {
 	fmt.Println("setting up cache")
 
@@ -74,13 +68,11 @@ func downloadLatestRelease() error {
 		return fmt.Errorf("failed to load cache")
 	}
 
-	// fmt.Println(c)
-	// fmt.Println("listing releases...")
-
 	ctx := context.Background()
 	client := github.NewClient(nil)
-
 	opts := &github.ListOptions{Page: 1, PerPage: 3}
+
+	fmt.Println("listing releases...")
 	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, opts)
 	if err != nil {
 		fmt.Println(err)
@@ -96,7 +88,7 @@ func downloadLatestRelease() error {
 	for _, r := range releases {
 		tag := r.GetTagName()
 		for _, a := range r.Assets {
-			if strings.HasSuffix(*a.Name, "amd64-linux-gcc.tar.gz") {
+			if strings.HasSuffix(*a.Name, suffix) {
 				id := a.GetID()
 				size := a.GetSize()
 				fmt.Printf("checking %v [size: %v]\n", tag, size)
@@ -131,6 +123,7 @@ func downloadLatestRelease() error {
 
 	fmt.Printf("extracting new archives [%v]\n", downloads)
 	for tag := range m {
+		fmt.Printf("extracting %v\n", tag)
 		filename := fmt.Sprintf("zsv/%v.tar.gz", tag)
 		file, err := os.Open(filename)
 		if err != nil {
@@ -157,34 +150,35 @@ func untar(targetDir string, r io.Reader) error {
 
 	for {
 		header, err := tr.Next()
-		switch {
-		case err == io.EOF:
+		if err == io.EOF {
 			return nil
-		case err != nil:
+		}
+		if err != nil {
 			return err
-		case header == nil:
+		}
+
+		// extract binary only i.e. .../bin/zsv
+		if !strings.HasSuffix(header.Name, "bin/") && !strings.HasSuffix(header.Name, "/bin/zsv") {
 			continue
 		}
 
-		if strings.HasSuffix(header.Name, "bin/") || strings.HasSuffix(header.Name, "/bin/zsv") {
-			target := filepath.Join(targetDir, header.Name)
-			switch header.Typeflag {
-			case tar.TypeDir:
-				if _, err := os.Stat(target); err != nil {
-					if err := os.MkdirAll(target, 0755); err != nil {
-						return err
-					}
-				}
-			case tar.TypeReg:
-				f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
-				if err != nil {
+		target := filepath.Join(targetDir, header.Name)
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
 					return err
 				}
-				if _, err := io.Copy(f, tr); err != nil {
-					return err
-				}
-				f.Close()
 			}
+		case tar.TypeReg:
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return err
+			}
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+			f.Close()
 		}
 	}
 }
