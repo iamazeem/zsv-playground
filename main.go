@@ -76,11 +76,30 @@ var templates = template.Must(template.ParseFiles("templates/index.html"))
 // 	}
 // }
 
+func generateZsvExePath(version string) string {
+	return fmt.Sprintf("%v/%v/%v/bin/zsv", cacheDir, version, triplet)
+}
+
+func getZsvExePaths(versions []string) []string {
+	bins := []string{}
+	for _, v := range versions {
+		zsv := generateZsvExePath(v)
+		bins = append(bins, zsv)
+	}
+	return bins
+}
+
 func main() {
-	if err := setupCache(); err != nil {
-		fmt.Printf("failed to set up cache, %v\n", err)
+	zsvVersions, err := setupZsvCache()
+	if err != nil {
+		fmt.Printf("failed to set up zsv cache, %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Printf("cached zsv versions: %v\n", zsvVersions)
+
+	zsvExePaths := getZsvExePaths(zsvVersions)
+	fmt.Printf("cached zsv binaries: %v\n", zsvExePaths)
 
 	// http.HandleFunc("/view/", makeHandler(viewHandler))
 	// http.HandleFunc("/edit/", makeHandler(editHandler))
