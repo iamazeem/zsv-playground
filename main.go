@@ -77,6 +77,11 @@ var templates = template.Must(template.ParseFiles("templates/index.html"))
 // }
 
 func main() {
+	if err := setupCache(); err != nil {
+		fmt.Printf("failed to set up cache, %v\n", err)
+		os.Exit(1)
+	}
+
 	// http.HandleFunc("/view/", makeHandler(viewHandler))
 	// http.HandleFunc("/edit/", makeHandler(editHandler))
 	// http.HandleFunc("/save/", makeHandler(saveHandler))
@@ -94,6 +99,4 @@ func main() {
 	// if err != nil {
 	// 	log.Fatalln(err)
 	// }
-
-	fmt.Println(downloadLatestRelease())
 }

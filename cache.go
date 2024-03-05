@@ -14,22 +14,24 @@ import (
 	"github.com/google/go-github/v60/github"
 )
 
-func setupCache() bool {
-	fmt.Println("setting up cache")
+func initCache() bool {
+	fmt.Println("initializing cache...")
 
-	fmt.Printf("checking existing cache directory [%v]\n", cacheDir)
+	fmt.Printf("checking cache directory [%v]\n", cacheDir)
 	if stat, err := os.Stat(cacheDir); err == nil && stat.IsDir() {
-		fmt.Println("cache directory exists")
+		fmt.Printf("cache directory exists\n")
 		return true
 	}
 
-	fmt.Println("cache directory not found, creating...")
+	fmt.Println("cache directory does not exist, creating...")
 	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
 		fmt.Printf("failed to create cache directory [%v]\n", err)
 		return false
+	} else {
+		fmt.Printf("cache directory created [%v]\n", cacheDir)
 	}
 
-	fmt.Println("cache directory set up successfully")
+	fmt.Println("initialized cache successfully")
 	return true
 }
 
@@ -59,8 +61,8 @@ func loadCache() (map[string]int64, bool) {
 	return c, true
 }
 
-func purgeCache(tags map[string]bool) bool {
-	fmt.Printf("purging cache\n")
+func cleanCache(tags map[string]bool) bool {
+	fmt.Printf("cleaning cache\n")
 
 	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
@@ -68,30 +70,34 @@ func purgeCache(tags map[string]bool) bool {
 		return false
 	}
 
-	purgeList := []string{}
+	cleanList := []string{}
 	for _, e := range entries {
 		entryName := e.Name()
 		if _, ok := tags[entryName]; !ok {
-			purgeList = append(purgeList, entryName)
+			cleanList = append(cleanList, entryName)
 		}
 	}
 
-	fmt.Printf("purge list: %v\n", purgeList)
-	for _, e := range purgeList {
+	count := 0
+	fmt.Printf("clean list: %v\n", cleanList)
+	for _, e := range cleanList {
 		p := filepath.Join(cacheDir, e)
 		if err := os.RemoveAll(p); err != nil {
-			fmt.Printf("failed to purge [%v]\n", p)
+			fmt.Printf("failed to remove [%v]\n", p)
 		} else {
-			fmt.Printf("purged %v\n", p)
+			fmt.Printf("removed %v\n", p)
+			count++
 		}
 	}
 
-	fmt.Printf("purged cache successfully [%v]\n", len(purgeList))
+	fmt.Printf("cleaned cache successfully [%v/%v]\n", count, len(cleanList))
 	return true
 }
 
-func downloadLatestRelease() error {
-	if !setupCache() {
+func setupCache() error {
+	fmt.Printf("setting up cache\n")
+
+	if !initCache() {
 		return fmt.Errorf("failed to set up cache")
 	}
 
@@ -167,11 +173,11 @@ func downloadLatestRelease() error {
 		}
 	}
 
-	if !purgeCache(tags) {
-		fmt.Printf("failed to purge cache\n")
+	if !cleanCache(tags) {
+		fmt.Printf("failed to clean cache\n")
 	}
 
-	fmt.Printf("cache populated successfully [downloads: %v]\n", downloads)
+	fmt.Printf("set up cache successfully [downloads: %v]\n", downloads)
 	return nil
 }
 
