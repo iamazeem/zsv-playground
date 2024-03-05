@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,6 +11,11 @@ type data struct {
 	PlaygroundVersion string
 	ZsvVersions       []string
 }
+
+var (
+	//go:embed templates/index.html
+	templatesFS embed.FS
+)
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
@@ -28,7 +34,7 @@ func main() {
 	zsvExePaths := getZsvExePaths(zsvVersions)
 	log.Printf("cached zsv binaries: %v\n", zsvExePaths)
 
-	templates, err := template.ParseFiles("templates/index.html")
+	templates, err := template.ParseFS(templatesFS, "templates/index.html")
 	if err != nil {
 		log.Fatalf("failed to parse templates, %v\n", err)
 	}
