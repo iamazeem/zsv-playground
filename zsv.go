@@ -26,19 +26,58 @@ func getZsvCommands(version string) bool {
 	log.Printf("getting zsv commands [%v]\n", version)
 
 	zsv := generateZsvExePath(version)
-	out, err := exec.Command(zsv, "help").Output()
+	output, err := exec.Command(zsv, "help").Output()
 	if err != nil {
 		log.Printf("%v\n", err)
 		return false
 	}
 
-	zsvHelpCommand, ok := parseZsvHelpCommand(string(out))
+	zsvHelpCommand, ok := parseZsvHelpCommand(string(output))
 	if !ok {
 		log.Printf("failed to parse 'zsv help' command\n")
 		return false
 	}
 
 	fmt.Printf("%v\n", zsvHelpCommand)
+
+	fmt.Printf("global flags\n")
+	for _, f := range zsvHelpCommand.Flags {
+		fmt.Printf("%v\n", f)
+	}
+
+	commands := map[string][]ZsvFlag{}
+
+	fmt.Printf("\ncommands\n")
+	for _, command := range zsvHelpCommand.SubCommands {
+		fmt.Printf("command: %v\n", command)
+		output, err := exec.Command(zsv, "help", command).Output()
+		if err != nil {
+			fmt.Printf("command: %v, error: %v\n", command, err)
+			// return false
+		}
+		commands[command] = []ZsvFlag{}
+		flags := []string{}
+		scanner := bufio.NewScanner(strings.NewReader(string(output)))
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, "Options") {
+				flags = parseZsvCommandFlags(scanner)
+			}
+		}
+		if len(flags) > 0 {
+			commands[command] = normalizeZsvFlags(flags)
+		}
+	}
+
+	fmt.Println(commands)
+
+	for c, f := range commands {
+		fmt.Println(c)
+		for _, zf := range f {
+			fmt.Println(zf.Flag, zf.Argument)
+		}
+	}
+
 	return true
 }
 
@@ -48,12 +87,32 @@ func parseZsvCommandFlags(scanner *bufio.Scanner) []string {
 		flag := strings.TrimSpace(scanner.Text())
 		if len(flag) == 0 {
 			break
-		} else if strings.HasPrefix(flag, "-") {
-			flag = strings.TrimSpace(flag[:strings.Index(flag, ":")])
-			flags = append(flags, flag)
+		} else if strings.HasPrefix(flag, "-") && !strings.HasPrefix(flag, "-o") {
+			i := strings.Index(flag, ":")
+			if i != -1 {
+				flag = strings.TrimSpace(flag[:strings.Index(flag, ":")])
+				flags = append(flags, flag)
+			}
 		}
 	}
 	return flags
+}
+
+func normalizeZsvFlags(flags []string) []ZsvFlag {
+	zsvFlags := []ZsvFlag{}
+	for _, flag := range flags {
+		flag = strings.Replace(flag, ", ", ",", 1)
+		index := strings.Index(flag, " ")
+		zsvFlg := ZsvFlag{}
+		if index == -1 { // without argument
+			zsvFlg.Flag = flag
+		} else { // with argument
+			zsvFlg.Flag = flag[:index]
+			zsvFlg.Argument = strings.TrimSpace(flag[index+1:])
+		}
+		zsvFlags = append(zsvFlags, zsvFlg)
+	}
+	return zsvFlags
 }
 
 func parseZsvCommands(scanner *bufio.Scanner) []string {
@@ -68,22 +127,6 @@ func parseZsvCommands(scanner *bufio.Scanner) []string {
 		}
 	}
 	return commands
-}
-
-func normalizeZsvFlags(flags []string) []ZsvFlag {
-	zsvFlags := []ZsvFlag{}
-	for _, flag := range flags {
-		index := strings.Index(flag, " ")
-		zsvFlg := ZsvFlag{}
-		if index == -1 { // without argument
-			zsvFlg.Flag = flag
-		} else { // with argument
-			zsvFlg.Flag = flag[:index]
-			zsvFlg.Argument = strings.TrimSpace(flag[index+1:])
-		}
-		zsvFlags = append(zsvFlags, zsvFlg)
-	}
-	return zsvFlags
 }
 
 func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
