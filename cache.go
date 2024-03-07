@@ -18,19 +18,19 @@ import (
 func initZsvCache() bool {
 	log.Println("initializing cache")
 
-	log.Printf("checking cache directory [%v]\n", cacheDir)
+	log.Printf("checking cache directory [%v]", cacheDir)
 	if stat, err := os.Stat(cacheDir); err == nil && stat.IsDir() {
-		log.Printf("cache directory exists\n")
+		log.Printf("cache directory exists")
 		return true
 	}
 
 	log.Println("cache directory does not exist, creating")
 	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
-		log.Printf("failed to create cache directory [%v]\n", err)
+		log.Printf("failed to create cache directory [%v]", err)
 		return false
 	}
 
-	log.Printf("cache directory created [%v]\n", cacheDir)
+	log.Printf("cache directory created [%v]", cacheDir)
 	log.Println("initialized cache successfully")
 	return true
 }
@@ -40,7 +40,7 @@ func loadZsvCache() (map[string]int64, bool) {
 
 	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
-		log.Printf("error while reading cache directory, %v\n", err)
+		log.Printf("error while reading cache directory, %v", err)
 		return nil, false
 	}
 
@@ -49,7 +49,7 @@ func loadZsvCache() (map[string]int64, bool) {
 		name := e.Name()
 		info, err := e.Info()
 		if err != nil {
-			log.Printf("failed to get directory entry info [%v], %v\n", name, err)
+			log.Printf("failed to get directory entry info [%v], %v", name, err)
 			return nil, false
 		}
 		if mode := info.Mode(); mode.IsRegular() && strings.HasSuffix(name, archive) {
@@ -58,20 +58,20 @@ func loadZsvCache() (map[string]int64, bool) {
 	}
 
 	if len(cache) == 0 {
-		log.Printf("cache is empty\n")
+		log.Printf("cache is empty")
 		return nil, true
 	}
 
-	log.Printf("cache loaded successfully [%v]\n", len(cache))
+	log.Printf("cache loaded successfully [%v]", len(cache))
 	return cache, true
 }
 
 func cleanZsvCache(tags map[string]bool) bool {
-	log.Printf("cleaning cache\n")
+	log.Printf("cleaning cache")
 
 	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
-		log.Printf("failed to read cache directory, %v\n", err)
+		log.Printf("failed to read cache directory, %v", err)
 		return false
 	}
 
@@ -84,28 +84,28 @@ func cleanZsvCache(tags map[string]bool) bool {
 	}
 
 	if len(cleanList) == 0 {
-		log.Printf("nothing to clean in cache\n")
+		log.Printf("nothing to clean in cache")
 		return true
 	}
 
 	count := 0
-	log.Printf("clean list: %v\n", cleanList)
+	log.Printf("clean list: %v", cleanList)
 	for _, e := range cleanList {
 		p := filepath.Join(cacheDir, e)
 		if err := os.RemoveAll(p); err != nil {
-			log.Printf("failed to remove [%v]\n", p)
+			log.Printf("failed to remove [%v]", p)
 		} else {
-			log.Printf("removed %v\n", p)
+			log.Printf("removed %v", p)
 			count++
 		}
 	}
 
-	log.Printf("cleaned cache successfully [%v/%v]\n", count, len(cleanList))
+	log.Printf("cleaned cache successfully [%v/%v]", count, len(cleanList))
 	return true
 }
 
 func setupZsvCache() ([]string, error) {
-	log.Printf("setting up zsv cache\n")
+	log.Printf("setting up zsv cache")
 
 	if !initZsvCache() {
 		return nil, fmt.Errorf("failed to set up cache")
@@ -120,7 +120,7 @@ func setupZsvCache() ([]string, error) {
 	client := github.NewClient(nil)
 	opts := &github.ListOptions{Page: 1, PerPage: 3}
 
-	log.Printf("checking latest zsv releases [%v]\n", opts.Page*opts.PerPage)
+	log.Printf("checking latest zsv releases [%v]", opts.Page*opts.PerPage)
 	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, opts)
 	if err != nil {
 		log.Println(err)
@@ -143,9 +143,9 @@ func setupZsvCache() ([]string, error) {
 			if strings.HasSuffix(*a.Name, suffix) {
 				id := a.GetID()
 				size := a.GetSize()
-				log.Printf("checking %v [size: %v]\n", tag, size)
+				log.Printf("checking %v [size: %v]", tag, size)
 				if cachedSize, ok := c[tarName]; ok && int64(size) == cachedSize {
-					log.Printf("%v found in cache, skipped\n", tag)
+					log.Printf("%v found in cache, skipped", tag)
 				} else {
 					m[tag] = id
 				}
@@ -155,10 +155,10 @@ func setupZsvCache() ([]string, error) {
 
 	downloads := 0
 	for tag, id := range m {
-		log.Printf("downloading %v [id: %v]\n", tag, id)
+		log.Printf("downloading %v [id: %v]", tag, id)
 		rc, _, err := client.Repositories.DownloadReleaseAsset(ctx, owner, repo, id, http.DefaultClient)
 		if err != nil {
-			log.Printf("failed to download %v\n", tag)
+			log.Printf("failed to download %v", tag)
 			return nil, err
 		}
 
@@ -172,26 +172,26 @@ func setupZsvCache() ([]string, error) {
 	}
 
 	if downloads > 0 {
-		log.Printf("downloads: %v\n", downloads)
+		log.Printf("downloads: %v", downloads)
 		for tag := range m {
-			log.Printf("extracting %v\n", tag)
+			log.Printf("extracting %v", tag)
 			filename := fmt.Sprintf("%v/%v.%v", cacheDir, tag, archive)
 			file, err := os.Open(filename)
 			if err != nil {
-				log.Printf("failed to open archive [%v], %v\n", filename, err)
+				log.Printf("failed to open archive [%v], %v", filename, err)
 			}
 			targetDir := filepath.Join(cacheDir, tag)
 			if err := untarZsvTarGz(targetDir, file); err != nil {
-				log.Printf("failed to untar archive [%v], %v\n", filename, err)
+				log.Printf("failed to untar archive [%v], %v", filename, err)
 			}
 		}
 	}
 
 	if !cleanZsvCache(requiredCacheContents) {
-		log.Printf("failed to clean cache\n")
+		log.Printf("failed to clean cache")
 	}
 
-	log.Printf("set up zsv cache successfully\n")
+	log.Printf("set up zsv cache successfully")
 	return versions, nil
 }
 

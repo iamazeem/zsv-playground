@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -23,36 +22,41 @@ const ()
 var ()
 
 func getZsvCommands(version string) bool {
-	log.Printf("getting zsv commands [%v]\n", version)
+	log.Printf("getting zsv commands [%v]", version)
 
 	zsv := generateZsvExePath(version)
 	output, err := exec.Command(zsv, "help").Output()
 	if err != nil {
-		log.Printf("%v\n", err)
+		log.Printf("failed to get output of `zsv help`, error: %v", err)
 		return false
 	}
 
 	zsvHelpCommand, ok := parseZsvHelpCommand(string(output))
 	if !ok {
-		log.Printf("failed to parse 'zsv help' command\n")
+		log.Print("failed to parse 'zsv help' command")
 		return false
 	}
 
-	fmt.Printf("%v\n", zsvHelpCommand)
+	log.Printf("zsv help: %v", zsvHelpCommand)
 
-	fmt.Printf("global flags\n")
-	for _, f := range zsvHelpCommand.Flags {
-		fmt.Printf("%v\n", f)
+	log.Print("listing global flags")
+	for _, zsvFlag := range zsvHelpCommand.Flags {
+		if zsvFlag.Argument == "" {
+			log.Print(zsvFlag.Flag)
+		} else {
+			log.Print(zsvFlag.Flag, " | ", zsvFlag.Argument)
+		}
 	}
 
 	subcommands := map[string][]ZsvFlag{}
 
-	fmt.Printf("\ncommands\n")
+	log.Print("listing all parsed commands with flags")
 	for _, subcommand := range zsvHelpCommand.SubCommands {
-		fmt.Printf("command: %v\n", subcommand)
+		log.Printf("command: %v", subcommand)
 		output, err := exec.Command(zsv, "help", subcommand).Output()
 		if err != nil {
-			fmt.Printf("command: %v, error: %v\n", subcommand, err)
+			log.Printf("command: %v, error: %v", subcommand, err)
+			// zsv help 2json returns exit code 5
 			// return false
 		}
 		subcommands[subcommand] = []ZsvFlag{}
@@ -69,20 +73,16 @@ func getZsvCommands(version string) bool {
 		}
 	}
 
-	fmt.Println(subcommands)
-
+	log.Print("listing subcommands with flags: ", subcommands)
 	for subcommand, zsvFlags := range subcommands {
-		fmt.Println()
-		fmt.Println(subcommand)
-		for _, zf := range zsvFlags {
-			fmt.Print(zf.Flag)
-			if zf.Argument != "" {
-				fmt.Println(" |", zf.Argument)
+		log.Print("subcommand: ", subcommand)
+		for _, zsvFlag := range zsvFlags {
+			if zsvFlag.Argument == "" {
+				log.Print(zsvFlag.Flag)
 			} else {
-				fmt.Println()
+				log.Print(zsvFlag.Flag, " | ", zsvFlag.Argument)
 			}
 		}
-		fmt.Println()
 	}
 
 	return true
@@ -94,7 +94,7 @@ func parseZsvCommandFlags(scanner *bufio.Scanner) []string {
 		flag := scanner.Text()
 		if len(flag) > 3 && strings.HasPrefix(flag, "  -") {
 			flag = strings.TrimSpace(flag)
-			if !strings.HasPrefix(flag, "-o") {
+			if !strings.HasPrefix(flag, "-o") && !strings.HasPrefix(flag, "-h") {
 				index := strings.Index(flag, ":")
 				if index != -1 {
 					flag = strings.TrimSpace(flag[:strings.Index(flag, ":")])
@@ -118,7 +118,7 @@ func normalizeZsvCommandFlags(flags []string) []ZsvFlag {
 			zsvFlg.Flag = flag
 		} else { // with argument
 			zsvFlg.Flag = flag[:index]
-			zsvFlg.Argument = strings.TrimSpace(flag[index+1:])
+			zsvFlg.Argument = strings.ReplaceAll(strings.ToLower(strings.TrimSpace(flag[index+1:])), " ", "_")
 		}
 		zsvFlags = append(zsvFlags, zsvFlg)
 	}
@@ -140,7 +140,7 @@ func parseZsvMainCommands(scanner *bufio.Scanner) []string {
 }
 
 func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
-	log.Printf("parsing command [zsv help]\n")
+	log.Print("parsing command [zsv help]")
 
 	flags := []string{}
 	commands := []string{}
@@ -158,19 +158,19 @@ func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Printf("failed to parse command [zsv help], %v\n", err)
+		log.Printf("failed to parse command [zsv help], %v", err)
 		return ZsvCommand{}, false
 	}
 
 	zsvFlags := normalizeZsvCommandFlags(flags)
 
-	log.Printf("parsed command successfully [zsv help]\n")
+	log.Print("parsed command successfully [zsv help]")
 	return ZsvCommand{Flags: zsvFlags, SubCommands: commands}, true
 }
 
 func parseZsvSubcommand(subcommand string) (ZsvCommand, bool) {
-	log.Printf("parsing 'zsv %v' subcommand\n", subcommand)
+	log.Printf("parsing 'zsv %v' subcommand", subcommand)
 
-	log.Printf("parsed 'zsv %v' subcommand successfully\n", subcommand)
+	log.Printf("parsed 'zsv %v' subcommand successfully", subcommand)
 	return ZsvCommand{}, true
 }
