@@ -239,14 +239,14 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 	}
 }
 
-func generateZsvExePath(version string) string {
+func getZsvExePath(version string) string {
 	return fmt.Sprintf("%v/%v/%v/bin/zsv", cacheDir, version, triplet)
 }
 
 func getZsvExePaths(versions []string) []string {
 	bins := []string{}
 	for _, v := range versions {
-		zsv := generateZsvExePath(v)
+		zsv := getZsvExePath(v)
 		bins = append(bins, zsv)
 	}
 	return bins

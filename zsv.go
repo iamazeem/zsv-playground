@@ -13,31 +13,42 @@ type ZsvFlag struct {
 }
 
 type ZsvCommand struct {
-	Flags       []ZsvFlag
-	SubCommands []string
+	Flags    []ZsvFlag
+	Commands []string
 }
 
-const ()
+// command -> flags
+type ZsvCommands map[string][]ZsvFlag
 
-var ()
+// version -> commands
+type zsvCLI map[string]ZsvCommands
 
-func getZsvCommands(version string) bool {
-	log.Printf("getting zsv commands [%v]", version)
+func loadCLIForAllZsvVersions(versions []string) (zsvCLI, bool) {
+	log.Printf("loading CLI for all zsv versions [%v]", versions)
 
-	zsv := generateZsvExePath(version)
-	output, err := exec.Command(zsv, "help").Output()
-	if err != nil {
-		log.Printf("failed to get output of `zsv help`, error: %v", err)
-		return false
+	zsv := zsvCLI{}
+	for _, version := range versions {
+		zsvCommands, ok := loadZsvCommands(version)
+		if !ok {
+			log.Printf("failed load CLI for zsv %v", version)
+			return nil, false
+		}
+		zsv[version] = zsvCommands
 	}
 
-	zsvHelpCommand, ok := parseZsvHelpCommand(string(output))
+	log.Printf("loading CLI for all zsv versions successfully [%v]", zsv)
+	return zsv, true
+}
+
+func loadZsvCommands(version string) (ZsvCommands, bool) {
+	log.Printf("loading zsv commands [%v]", version)
+
+	zsv := getZsvExePath(version)
+	zsvHelpCommand, ok := loadZsvHelpCommand(zsv)
 	if !ok {
 		log.Print("failed to parse 'zsv help' command")
-		return false
+		return nil, false
 	}
-
-	log.Printf("zsv help: %v", zsvHelpCommand)
 
 	log.Print("listing global flags")
 	for _, zsvFlag := range zsvHelpCommand.Flags {
@@ -48,44 +59,9 @@ func getZsvCommands(version string) bool {
 		}
 	}
 
-	subcommands := map[string][]ZsvFlag{}
-
-	log.Print("listing all parsed commands with flags")
-	for _, subcommand := range zsvHelpCommand.SubCommands {
-		log.Printf("command: %v", subcommand)
-		output, err := exec.Command(zsv, "help", subcommand).Output()
-		if err != nil {
-			log.Printf("command: %v, error: %v", subcommand, err)
-			// zsv help 2json returns exit code 5
-			// return false
-		}
-		subcommands[subcommand] = []ZsvFlag{}
-		flags := []string{}
-		scanner := bufio.NewScanner(strings.NewReader(string(output)))
-		for scanner.Scan() {
-			line := scanner.Text()
-			if strings.HasPrefix(line, "Options") {
-				flags = parseZsvCommandFlags(scanner)
-			}
-		}
-		if len(flags) > 0 {
-			subcommands[subcommand] = normalizeZsvCommandFlags(flags)
-		}
-	}
-
-	log.Print("listing subcommands with flags: ", subcommands)
-	for subcommand, zsvFlags := range subcommands {
-		log.Print("subcommand: ", subcommand)
-		for _, zsvFlag := range zsvFlags {
-			if zsvFlag.Argument == "" {
-				log.Print(zsvFlag.Flag)
-			} else {
-				log.Print(zsvFlag.Flag, " | ", zsvFlag.Argument)
-			}
-		}
-	}
-
-	return true
+	subcommands := loadZsvSubcommands(zsv, zsvHelpCommand)
+	log.Printf("loaded zsv commands successfully [%v]", version)
+	return subcommands, true
 }
 
 func parseZsvCommandFlags(scanner *bufio.Scanner) []string {
@@ -139,12 +115,18 @@ func parseZsvMainCommands(scanner *bufio.Scanner) []string {
 	return commands
 }
 
-func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
-	log.Print("parsing command [zsv help]")
+func loadZsvHelpCommand(zsv string) (ZsvCommand, bool) {
+	log.Print("loading 'zsv help' command")
+
+	output, err := exec.Command(zsv, "help").Output()
+	if err != nil {
+		log.Printf("failed to get output of 'zsv help', error: %v", err)
+		return ZsvCommand{}, false
+	}
 
 	flags := []string{}
 	commands := []string{}
-	scanner := bufio.NewScanner(strings.NewReader(help))
+	scanner := bufio.NewScanner(strings.NewReader(string(output)))
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "Options common to all commands") {
@@ -158,19 +140,60 @@ func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Printf("failed to parse command [zsv help], %v", err)
+		log.Printf("failed to parse 'zsv help' command, error: %v", err)
 		return ZsvCommand{}, false
 	}
 
 	zsvFlags := normalizeZsvCommandFlags(flags)
+	zsvHelpCommand := ZsvCommand{
+		Flags:    zsvFlags,
+		Commands: commands,
+	}
 
-	log.Print("parsed command successfully [zsv help]")
-	return ZsvCommand{Flags: zsvFlags, SubCommands: commands}, true
+	log.Printf("zsv help: %v", zsvHelpCommand)
+	log.Print("load 'zsv help' command successfully")
+	return zsvHelpCommand, true
 }
 
-func parseZsvSubcommand(subcommand string) (ZsvCommand, bool) {
-	log.Printf("parsing 'zsv %v' subcommand", subcommand)
+func loadZsvSubcommands(zsv string, zsvHelpCommand ZsvCommand) map[string][]ZsvFlag {
+	log.Print("loading all subcommands with flags")
 
-	log.Printf("parsed 'zsv %v' subcommand successfully", subcommand)
-	return ZsvCommand{}, true
+	subcommands := map[string][]ZsvFlag{}
+
+	for _, subcommand := range zsvHelpCommand.Commands {
+		log.Printf("subcommand: %v", subcommand)
+		output, err := exec.Command(zsv, "help", subcommand).Output()
+		if err != nil {
+			log.Printf("subcommand: %v, error: %v", subcommand, err)
+			// zsv help 2json returns exit code 5
+			// return false
+		}
+		subcommands[subcommand] = []ZsvFlag{}
+		flags := []string{}
+		scanner := bufio.NewScanner(strings.NewReader(string(output)))
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, "Options") {
+				flags = parseZsvCommandFlags(scanner)
+			}
+		}
+		if len(flags) > 0 {
+			subcommands[subcommand] = normalizeZsvCommandFlags(flags)
+		}
+	}
+
+	log.Print("listing subcommands with flags: ", subcommands)
+	for subcommand, zsvFlags := range subcommands {
+		log.Print("subcommand: ", subcommand)
+		for _, zsvFlag := range zsvFlags {
+			if zsvFlag.Argument == "" {
+				log.Print(zsvFlag.Flag)
+			} else {
+				log.Print(zsvFlag.Flag, " | ", zsvFlag.Argument)
+			}
+		}
+	}
+
+	log.Print("loaded all subcommands with flags successfully")
+	return subcommands
 }
