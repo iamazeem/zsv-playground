@@ -45,17 +45,17 @@ func getZsvCommands(version string) bool {
 		fmt.Printf("%v\n", f)
 	}
 
-	commands := map[string][]ZsvFlag{}
+	subcommands := map[string][]ZsvFlag{}
 
 	fmt.Printf("\ncommands\n")
-	for _, command := range zsvHelpCommand.SubCommands {
-		fmt.Printf("command: %v\n", command)
-		output, err := exec.Command(zsv, "help", command).Output()
+	for _, subcommand := range zsvHelpCommand.SubCommands {
+		fmt.Printf("command: %v\n", subcommand)
+		output, err := exec.Command(zsv, "help", subcommand).Output()
 		if err != nil {
-			fmt.Printf("command: %v, error: %v\n", command, err)
+			fmt.Printf("command: %v, error: %v\n", subcommand, err)
 			// return false
 		}
-		commands[command] = []ZsvFlag{}
+		subcommands[subcommand] = []ZsvFlag{}
 		flags := []string{}
 		scanner := bufio.NewScanner(strings.NewReader(string(output)))
 		for scanner.Scan() {
@@ -65,17 +65,24 @@ func getZsvCommands(version string) bool {
 			}
 		}
 		if len(flags) > 0 {
-			commands[command] = normalizeZsvFlags(flags)
+			subcommands[subcommand] = normalizeZsvCommandFlags(flags)
 		}
 	}
 
-	fmt.Println(commands)
+	fmt.Println(subcommands)
 
-	for c, f := range commands {
-		fmt.Println(c)
-		for _, zf := range f {
-			fmt.Println(zf.Flag, zf.Argument)
+	for subcommand, zsvFlags := range subcommands {
+		fmt.Println()
+		fmt.Println(subcommand)
+		for _, zf := range zsvFlags {
+			fmt.Print(zf.Flag)
+			if zf.Argument != "" {
+				fmt.Println(" |", zf.Argument)
+			} else {
+				fmt.Println()
+			}
 		}
+		fmt.Println()
 	}
 
 	return true
@@ -84,21 +91,24 @@ func getZsvCommands(version string) bool {
 func parseZsvCommandFlags(scanner *bufio.Scanner) []string {
 	flags := []string{}
 	for scanner.Scan() {
-		flag := strings.TrimSpace(scanner.Text())
-		if len(flag) == 0 {
-			break
-		} else if strings.HasPrefix(flag, "-") && !strings.HasPrefix(flag, "-o") {
-			i := strings.Index(flag, ":")
-			if i != -1 {
-				flag = strings.TrimSpace(flag[:strings.Index(flag, ":")])
-				flags = append(flags, flag)
+		flag := scanner.Text()
+		if len(flag) > 3 && strings.HasPrefix(flag, "  -") {
+			flag = strings.TrimSpace(flag)
+			if !strings.HasPrefix(flag, "-o") {
+				index := strings.Index(flag, ":")
+				if index != -1 {
+					flag = strings.TrimSpace(flag[:strings.Index(flag, ":")])
+					flags = append(flags, flag)
+				}
 			}
+		} else if strings.TrimSpace(flag) == "" {
+			break
 		}
 	}
 	return flags
 }
 
-func normalizeZsvFlags(flags []string) []ZsvFlag {
+func normalizeZsvCommandFlags(flags []string) []ZsvFlag {
 	zsvFlags := []ZsvFlag{}
 	for _, flag := range flags {
 		flag = strings.Replace(flag, ", ", ",", 1)
@@ -115,11 +125,11 @@ func normalizeZsvFlags(flags []string) []ZsvFlag {
 	return zsvFlags
 }
 
-func parseZsvCommands(scanner *bufio.Scanner) []string {
+func parseZsvMainCommands(scanner *bufio.Scanner) []string {
 	commands := []string{}
 	for scanner.Scan() {
 		cmd := strings.TrimSpace(scanner.Text())
-		if len(cmd) == 0 {
+		if cmd == "" {
 			break
 		} else if strings.Contains(cmd, ":") {
 			cmd = strings.TrimSpace(cmd[:strings.Index(cmd, ":")])
@@ -140,7 +150,7 @@ func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
 		if strings.HasPrefix(line, "Options common to all commands") {
 			flags = parseZsvCommandFlags(scanner)
 		} else if strings.HasPrefix(line, "Commands that parse CSV") {
-			commands = parseZsvCommands(scanner)
+			commands = parseZsvMainCommands(scanner)
 		}
 		if len(flags) > 0 && len(commands) > 0 {
 			break
@@ -152,7 +162,7 @@ func parseZsvHelpCommand(help string) (ZsvCommand, bool) {
 		return ZsvCommand{}, false
 	}
 
-	zsvFlags := normalizeZsvFlags(flags)
+	zsvFlags := normalizeZsvCommandFlags(flags)
 
 	log.Printf("parsed command successfully [zsv help]\n")
 	return ZsvCommand{Flags: zsvFlags, SubCommands: commands}, true
