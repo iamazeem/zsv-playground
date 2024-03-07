@@ -14,10 +14,41 @@
     }
   </style>
   <script>
-    function updateCommand() {
+    function updateCommands() {
+      const cli = {
+        "v0.3.8-alpha": [
+          "<option value='' selected>Select command</option>",
+          "<option value='select'>select</option>"
+        ],
+        "v0.3.7-alpha": [
+          "<option value='' selected>Select command</option>",
+          "<option value='select'>select</option>",
+          "<option value='echo'>echo</option>"
+        ],
+        "v0.3.6-alpha": [
+          "<option value='' selected>Select command</option>",
+          "<option value='select'>select</option>",
+          "<option value='echo'>echo</option>",
+          "<option value='sql'>sql</option>"
+        ]
+      };
+      const version = document.getElementById("version").value;
+      if (version === "") {
+        document.getElementById("command").innerHTML = "";
+      } else {
+        document.getElementById("command").innerHTML = cli[version].join();
+      }
+    }
+
+    function updateCLI() {
       const command = document.getElementById("command").value;
       document.getElementById("cli").value = "zsv " + command;
     }
+
+    function updateFlagsAndCLI() {
+      updateCLI();
+    }
+
   </script>
   <title>zsv playground</title>
 </head>
@@ -32,7 +63,8 @@
     <!-- version -->
     <div class="row mt-4 mb-4 text-center">
       <div class="col-12">
-        <select id="version" class="form-select w-25 mx-auto text-center" required>
+        <select id="version" class="form-select w-25 mx-auto text-center" required onchange="updateCommands();">
+          <option value="" selected>Select zsv version</option>
           <option value="v0.3.8-alpha">zsv v0.3.8-alpha</option>
           <option value="v0.3.7-alpha">zsv v0.3.7-alpha</option>
           <option value="v0.3.6-alpha">zsv v0.3.6-alpha</option>
@@ -44,15 +76,16 @@
       <div class="row mb-3 flex-nowrap">
         <!-- commands -->
         <div class="col-3">
-          <select id="command" class="form-select overflow-auto" size="7" required onchange="updateCommand();">
-            <option value="select">select</option>
-            <option value="echo">echo</option>
+          <select id="command" class="form-select overflow-auto" size="7" required onchange="updateFlagsAndCLI();">
+            <!-- <option value="" selected>Select command</option> -->
+            <!-- <option value="select">select</option> -->
+            <!-- <option value="echo">echo</option> -->
           </select>
         </div>
 
         <!-- flags -->
         <div class="col-9">
-          <div class="list-group overflow-auto p-2 border" style="max-height: 150px;">
+          <div id="flags" class="list-group overflow-auto p-2 border" style="max-height: 150px;">
             <div class="input-group">
               <div class="input-group-text">
                 <input class="form-check-input" type="checkbox" value="" />
@@ -87,7 +120,7 @@
       <div class="row">
         <div class="input-group">
           <input id="cli" type="text" class="form-control bg-light" value="zsv" readonly />
-          <button class="btn btn-outline-primary" type="submit">Run</button>
+          <button id="run" class="btn btn-outline-primary" type="submit">Run</button>
         </div>
       </div>
 
