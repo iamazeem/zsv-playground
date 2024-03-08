@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 type data struct {
@@ -63,9 +67,27 @@ func main() {
 		templates.ExecuteTemplate(w, "index.html", d)
 	})
 
+	// start http server and wait for SIGINT
+
 	address := ":8080"
-	log.Printf("starting http server [%v]", address)
-	if err := http.ListenAndServe(address, nil); err != nil {
-		log.Fatalln(err)
+	server := &http.Server{Addr: address}
+	go func() {
+		log.Printf("starting http server")
+		if err := server.ListenAndServe(); err != nil {
+			log.Print(err)
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+	log.Print("waiting for SIGINT to shutdown")
+	<-stop
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal(err)
 	}
+
+	log.Print("exiting zsv playground, bye!")
 }
