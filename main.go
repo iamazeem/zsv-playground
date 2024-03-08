@@ -72,7 +72,7 @@ func main() {
 	address := ":8080"
 	server := &http.Server{Addr: address}
 	go func() {
-		log.Printf("starting http server")
+		log.Printf("starting http server [graceful shutdown on SIGINT]")
 		if err := server.ListenAndServe(); err != nil {
 			log.Print(err)
 		}
@@ -80,13 +80,12 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
-	log.Print("waiting for SIGINT to shutdown")
 	<-stop
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to shutdown, error: %v", err)
 	}
 
 	log.Print("exiting zsv playground, bye!")
