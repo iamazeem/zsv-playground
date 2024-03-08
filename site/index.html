@@ -322,6 +322,7 @@
       const version = document.getElementById("version").value;
       if (version === "") {
         document.getElementById("commands").innerHTML = "";
+        document.getElementById("flags").innerHTML = "";
         return;
       }
       var commandsHTML = [
@@ -362,24 +363,20 @@
       }
 
       const commands = zsv[version]["commands"];
-      for (let c of commands.find(cmd => cmd.name === command)["flags"]) {
-        if (c["flags"] !== undefined) {
-          for (let flag of c["flags"]) {
-            const id = flag.name.replace(/-|,/g, "");
-            var f = `
-                <div class="input-group mb-3">
-                  <div class="input-group-text">
-                    <input id="${id}" class="form-check-input" type="checkbox" />
-                  </div>
-                  <span class="form-control input-group-text w-50">${flag.name}</span>
-              `;
-            if (flag.argument !== undefined) {
-              f += `<input id="${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
-            }
-            f += '</div>';
-            flagsHTML.push(f);
-          }
+      for (let flag of commands.find(cmd => cmd.name === command)["flags"]) {
+        const id = flag.name.replace(/-|,/g, "");
+        var f = `
+          <div class="input-group mb-0">
+            <div class="input-group-text">
+              <input id="${id}" class="form-check-input" type="checkbox" />
+            </div>
+            <span class="form-control input-group-text w-50">${flag.name}</span>
+        `;
+        if (flag.argument !== undefined) {
+          f += `<input id="${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
         }
+        f += '</div>';
+        flagsHTML.push(f);
       }
 
       document.getElementById("flags").innerHTML = flagsHTML.join("");
