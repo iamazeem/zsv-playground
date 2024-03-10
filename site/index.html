@@ -351,7 +351,7 @@
         f = `
           <div class="input-group mb-0">
             <div class="input-group-text">
-              <input id="${id}" class="form-check-input" type="checkbox" />
+              <input id="flag_${id}" class="form-check-input" type="checkbox" />
             </div>
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
@@ -368,12 +368,12 @@
         var f = `
           <div class="input-group mb-0">
             <div class="input-group-text">
-              <input id="${id}" class="form-check-input" type="checkbox" />
+              <input id="flag_${id}" class="form-check-input" type="checkbox" />
             </div>
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
         if (flag.argument !== undefined) {
-          f += `<input id="${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
         }
         f += '</div>';
         flagsHTML.push(f);
@@ -431,21 +431,19 @@
         <!-- flags -->
         <div class="col-9">
           <div id="flags" class="list-group overflow-auto p-2 border" style="max-height: 150px; height: 150px;">
-            <!--
-            <div class="input-group">
+            <!-- <div class="input-group">
               <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
+                <input id="flag_Bboolean" class="form-check-input" type="checkbox" />
               </div>
-              <span class="form-control input-group-text">boolean flag</span>
+              <span class="form-control input-group-text">-B,--boolean</span>
             </div>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
+                <input id="flag_Vvalue" class="form-check-input" type="checkbox" value="" />
               </div>
-              <span class="form-control input-group-text w-50">flag with value</span>
-              <input type="text" class="form-control" placeholder="value" />
-            </div>
-          -->
+              <span class="form-control input-group-text w-50">-V,--value</span>
+              <input id="flag_Vvalue_value" type="text" class="form-control" placeholder="value" />
+            </div> -->
           </div>
         </div>
       </div>
