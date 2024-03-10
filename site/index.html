@@ -318,10 +318,10 @@
       }
     };
 
-    function updateCommands(event) {
+    function populateCommands(event) {
       document.getElementById("commands").innerHTML = "";
       document.getElementById("flags").innerHTML = "";
-      document.getElementById("cli").innerHTML = "zsv";
+      document.getElementById("cli").value = "zsv";
       const version = document.getElementById("version").value;
       if (zsv[version] !== undefined) {
         const commands = zsv[version]["commands"];
@@ -341,7 +341,7 @@
       return name.replace(/-|,/g, "");
     }
 
-    function updateFlags(command) {
+    function populateFlags(command) {
       const version = document.getElementById("version").value;
       if (version === "") {
         document.getElementById("flags").innerHTML = "";
@@ -355,12 +355,12 @@
         f = `
           <div class="input-group mb-0">
             <div class="input-group-text">
-              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="updateCliWithFlags(event);" />
+              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
             </div>
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
         if (flag.argument !== undefined) {
-          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" />`;
         }
         f += '</div>';
         flagsHTML.push(f);
@@ -372,12 +372,12 @@
         var f = `
           <div class="input-group mb-0">
             <div class="input-group-text">
-              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="updateCliWithFlags(event);" />
+              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
             </div>
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
         if (flag.argument !== undefined) {
-          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" />`;
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" />`;
         }
         f += '</div>';
         flagsHTML.push(f);
@@ -389,7 +389,7 @@
       document.getElementById("cli").value = "zsv " + command;
     }
 
-    function updateFlagsAndCLI() {
+    function handleCommand() {
       const command = document.getElementById("commands").value;
       if (command === "") {
         document.getElementById("flags").innerHTML = "";
@@ -397,14 +397,37 @@
         return;
       }
       updateCLI(command);
-      updateFlags(command);
+      populateFlags(command);
     }
 
-    function updateCliWithFlags(event) {
+    function updateCLIWithFlag(checked, flag, value) {
+      var cli = document.getElementById("cli").value.split(" ");
+      if (checked === true) {
+        if (value === "") {
+          cli.push(flag);
+        } else {
+          const i = cli.indexOf(flag);
+          if (i === -1) {
+            cli.push(flag, value);
+          } else {
+            cli[i + 1] = value;
+          }
+        }
+      } else {
+        const i = cli.indexOf(flag);
+        if (value === "") {
+          cli.splice(i, 1);
+        } else {
+          cli.splice(i, 2);
+        }
+      }
+      document.getElementById("cli").value = cli.join(" ");
+    }
+
+    function handleFlag(event) {
       const flagId = event.target.id;
       const flagName = event.target.value;
       const flagValue = document.getElementById(flagId + "_value");
-
       var flag = flagName;
       if (flag.indexOf(",") !== -1) {
         flag = flag.substring(0, flag.indexOf(","));
@@ -418,28 +441,28 @@
           value = `''`;
         }
       }
+      updateCLIWithFlag(event.target.checked, flag, value);
+    }
 
-      var cli = document.getElementById("cli").value.split(" ");
-      if (event.target.checked === true) {
-        if (value === "") {
-          cli.push(flag);
-        } else {
-          const i = cli.indexOf(flag);
-          if (i === -1) {
-            cli.push(flag, value);
-          } else {
-            cli.splice(i + 1, 0, value);
-          }
-        }
-      } else {
-        const i = cli.indexOf(flag);
-        if (value === "") {
-          cli.splice(i, 1);
-        } else {
-          cli.splice(i, 2);
-        }
+    function handleFlagValue(event) {
+      const valueId = event.target.id;
+      const flagValue = event.target.value;
+      const flagId = valueId.replace("_value", "");
+      const flagObject = document.getElementById(flagId);
+      const checked = flagObject.checked;
+      var flag = flagObject.value;
+      if (flag.indexOf(",") !== -1) {
+        flag = flag.substring(0, flag.indexOf(","));
       }
-      document.getElementById("cli").value = cli.join(" ");
+      var value = "";
+      if (flagValue !== "") {
+        value = `'${flagValue}'`;
+      } else {
+        value = `''`;
+      }
+      if (checked === true) {
+        updateCLIWithFlag(checked, flag, value);
+      }
     }
 
   </script>
@@ -456,7 +479,7 @@
     <!-- version -->
     <div class="row mt-4 mb-4 text-center">
       <div class="col-12">
-        <select id="version" class="form-select w-25 mx-auto text-center" required onchange="updateCommands(event);">
+        <select id="version" class="form-select w-25 mx-auto text-center" required onchange="populateCommands(event);">
           <option value="" selected>Select zsv version</option>
           <option value="v0.3.8-alpha">zsv v0.3.8-alpha</option>
           <option value="v0.3.7-alpha">zsv v0.3.7-alpha</option>
@@ -469,28 +492,29 @@
       <div class="row mb-3 flex-nowrap">
         <!-- commands -->
         <div class="col-3">
-          <select id="commands" class="form-select overflow-auto" size="7" required onchange="updateFlagsAndCLI();">
+          <select id="commands" class="form-select overflow-auto" size="7" required onchange="handleCommand();">
           </select>
         </div>
 
         <!-- flags -->
         <div class="col-9">
           <div id="flags" class="list-group overflow-auto p-2 border" style="max-height: 150px; height: 150px;">
-            <!-- <div class="input-group">
+            <div class="input-group">
               <div class="input-group-text">
                 <input id="flag_Bboolean" class="form-check-input" type="checkbox" value="-B,--boolean"
-                  onchange="updateCliWithFlags(event);" />
+                  onchange="handleFlag(event);" />
               </div>
               <span class="form-control input-group-text">-B,--boolean</span>
             </div>
             <div class="input-group mb-3">
               <div class="input-group-text">
                 <input id="flag_Vvalue" class="form-check-input" type="checkbox" value="-V,--value"
-                  onchange="updateCliWithFlags(event);" />
+                  onchange="handleFlag(event);" />
               </div>
               <span class="form-control input-group-text w-50">-V,--value</span>
-              <input id="flag_Vvalue_value" type="text" class="form-control" placeholder="value" />
-            </div> -->
+              <input id="flag_Vvalue_value" type="text" class="form-control" placeholder="value"
+                onkeyup="handleFlagValue(event);" />
+            </div>
           </div>
         </div>
       </div>
