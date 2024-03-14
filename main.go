@@ -25,7 +25,7 @@ func init() {
 }
 
 func main() {
-	log.Printf("starting zsv playground")
+	log.Printf("starting zsv playground [%v]", version)
 
 	zsvVersions, err := setupZsvCache()
 	if err != nil {
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	clisJsonStr := string(clisJson)
-	log.Print(clisJsonStr)
+	// log.Print(clisJsonStr)
 
 	templates, err := template.ParseFS(templatesFS, "templates/index.html")
 	if err != nil {
