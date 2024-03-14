@@ -18,13 +18,17 @@ Download the latest build from the
 
 Go to http://localhost:8080/ in your browser.
 
-## How it works?
+## How it works
 
-- `zsv-playground` uses the latest three `zsv` releases.
+- `zsv-playground` aims to be a single static binary with everything bundled in
+  it.
+- By default, it uses the latest three `zsv`
+  [releases](https://github.com/liquidaty/zsv/releases). It does not build `zsv`
+  itself.
   - These downloaded releases are extracted to a subdirectory named `zsv` on the
     current path.
   - Remove this directory manually if it's no longer needed.
-- All the downloaded `zsv` versions are used to generate the HTML with the main
+- These downloaded `zsv` versions are used to generate the HTML with the main
   commands and their respective flags.
 - The user inputs the CSV, selects a command, chooses the required flags, and
   hits `Run`.
