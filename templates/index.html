@@ -14,9 +14,161 @@
     }
   </style>
   <script>
-    function updateCommand() {
-      const command = document.getElementById("command").value;
+    const zsv = '{{ .Zsv }}';
+
+    function populateCommands(event) {
+      document.getElementById("commands").innerHTML = "";
+      document.getElementById("flags").innerHTML = "";
+      document.getElementById("cli").value = "zsv";
+      const version = document.getElementById("version").value;
+      if (zsv[version] !== undefined) {
+        const commands = zsv[version]["commands"];
+        if (commands.length !== 0) {
+          var commandsHTML = [
+            "<option value='' selected>Select command</option>",
+          ];
+          for (let command of commands) {
+            commandsHTML.push(`"<option value='${command.name}'>${command.name}</option>"`);
+          }
+          document.getElementById("commands").innerHTML = commandsHTML.join("");
+        }
+      }
+    }
+
+    function normalizeFlagName(name) {
+      return name.replace(/-|,/g, "");
+    }
+
+    function populateFlags(command) {
+      const version = document.getElementById("version").value;
+      if (version === "") {
+        document.getElementById("flags").innerHTML = "";
+        return;
+      }
+
+      var flagsHTML = [];
+      const globalFlags = zsv[version]["global_flags"];
+      for (let flag of globalFlags) {
+        const id = normalizeFlagName(flag.name);
+        f = `
+          <div class="input-group mb-0">
+            <div class="input-group-text">
+              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
+            </div>
+            <span class="form-control input-group-text w-50">${flag.name}</span>
+        `;
+        if (flag.argument !== undefined) {
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
+        }
+        f += '</div>';
+        flagsHTML.push(f);
+      }
+
+      const commands = zsv[version]["commands"];
+      for (let flag of commands.find(cmd => cmd.name === command)["flags"]) {
+        const id = normalizeFlagName(flag.name);
+        var f = `
+          <div class="input-group mb-0">
+            <div class="input-group-text">
+              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
+            </div>
+            <span class="form-control input-group-text w-50">${flag.name}</span>
+        `;
+        if (flag.argument !== undefined) {
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
+        }
+        f += '</div>';
+        flagsHTML.push(f);
+      }
+      document.getElementById("flags").innerHTML = flagsHTML.join("");
+    }
+
+    function updateCLI(command) {
       document.getElementById("cli").value = "zsv " + command;
+    }
+
+    function handleCommand() {
+      const command = document.getElementById("commands").value;
+      if (command === "") {
+        document.getElementById("flags").innerHTML = "";
+        document.getElementById("cli").value = "zsv";
+        return;
+      }
+      updateCLI(command);
+      populateFlags(command);
+    }
+
+    function updateCLIWithFlag(checked, flag, value) {
+      var cli = document.getElementById("cli").value.split(" ");
+      if (checked === true) {
+        if (value === "") {
+          cli.push(flag);
+        } else {
+          const i = cli.indexOf(flag);
+          if (i === -1) {
+            cli.push(flag, value);
+          } else {
+            cli[i + 1] = value;
+          }
+        }
+      } else {
+        const i = cli.indexOf(flag);
+        if (value === "") {
+          cli.splice(i, 1);
+        } else {
+          cli.splice(i, 2);
+        }
+      }
+      document.getElementById("cli").value = cli.join(" ");
+    }
+
+    function handleFlag(event) {
+      const flagId = event.target.id;
+      const flagName = event.target.value;
+      const flagValue = document.getElementById(flagId + "_value");
+      var flag = flagName;
+      if (flag.indexOf(",") !== -1) {
+        flag = flag.substring(0, flag.indexOf(","));
+      }
+
+      var value = "";
+      if (flagValue !== null) {
+        if (flagValue.value !== "") {
+          value = `'${flagValue.value}'`;
+        } else {
+          value = `''`;
+        }
+      }
+      updateCLIWithFlag(event.target.checked, flag, value);
+    }
+
+    function handleFlagValue(event) {
+      const valueId = event.target.id;
+      const flagValue = event.target.value;
+      const flagId = valueId.replace("_value", "");
+      const flagObject = document.getElementById(flagId);
+      const checked = flagObject.checked;
+      var flag = flagObject.value;
+      if (flag.indexOf(",") !== -1) {
+        flag = flag.substring(0, flag.indexOf(","));
+      }
+      var value = "";
+      if (flagValue !== "") {
+        value = `'${flagValue}'`;
+      } else {
+        value = `''`;
+      }
+      if (checked === true) {
+        updateCLIWithFlag(checked, flag, value);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.code === "Space") {
+        console.log(event);
+        event.preventDefault();
+        return false;
+      }
     }
   </script>
   <title>zsv playground {{ .PlaygroundVersion }}</title>
@@ -31,9 +183,12 @@
     <!-- version -->
     <div class="row mt-4 mb-4 text-center">
       <div class="col-12">
-        <select id="version" class="form-select w-25 mx-auto text-center" required>
+        <select id="version" class="form-select w-25 mx-auto text-center" required onchange="populateCommands(event);">
+          {{- if .ZsvVersions }}
+          <option value="" selected>Select zsv version</option>
           {{- range .ZsvVersions }}
           <option value="{{ . }}">zsv {{ . }}</option>
+          {{- end }}
           {{- end }}
         </select>
       </div>
@@ -43,41 +198,13 @@
       <div class="row mb-3 flex-nowrap">
         <!-- commands -->
         <div class="col-3">
-          <select id="command" class="form-select overflow-auto" size="7" required onchange="updateCommand();">
-            <option value="select">select</option>
-            <option value="echo">echo</option>
+          <select id="command" class="form-select overflow-auto" size="7" required onchange="handleCommand();">
           </select>
         </div>
 
         <!-- flags -->
         <div class="col-9">
-          <div class="list-group overflow-auto p-2 border" style="max-height: 150px;">
-            <div class="input-group">
-              <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
-              </div>
-              <span class="form-control input-group-text">boolean flag</span>
-            </div>
-            <div class="input-group">
-              <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
-              </div>
-              <span class="form-control input-group-text">boolean flag</span>
-            </div>
-            <div class="input-group">
-              <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
-              </div>
-              <span class="form-control input-group-text w-50">flag with value</span>
-              <input type="text" class="form-control" placeholder="value" />
-            </div>
-            <div class="input-group mb-3">
-              <div class="input-group-text">
-                <input class="form-check-input" type="checkbox" value="" />
-              </div>
-              <span class="form-control input-group-text w-50">flag with value</span>
-              <input type="text" class="form-control" placeholder="value" />
-            </div>
+          <div id="flags" class="list-group overflow-auto p-2 border" style="max-height: 150px; height: 150px;">
           </div>
         </div>
       </div>
@@ -98,10 +225,19 @@
         </div>
         <div class="col">
           <label for="result" class="form-label">Result</label>
-          <textarea id="result" class="form-control" readonly></textarea>
+          <textarea id="result" class="form-control bg-light" readonly></textarea>
         </div>
       </div>
     </form>
+
+    <!-- GitHub repo link -->
+    <div class="row mt-4 mb-4 text-center">
+      <div class="col-12">
+        <span class="w-25 mx-auto text-center">
+          <a href="https://github.com/iamazeem/zsv-playground">GitHub</a>
+        </span>
+      </div>
+    </div>
   </div>
 </body>
 
