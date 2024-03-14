@@ -360,7 +360,7 @@
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
         if (flag.argument !== undefined) {
-          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" />`;
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
         }
         f += '</div>';
         flagsHTML.push(f);
@@ -377,7 +377,7 @@
             <span class="form-control input-group-text w-50">${flag.name}</span>
         `;
         if (flag.argument !== undefined) {
-          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" />`;
+          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
         }
         f += '</div>';
         flagsHTML.push(f);
@@ -465,6 +465,14 @@
       }
     }
 
+    function handleKeyDown(event) {
+      if (event.code === "Space") {
+        console.log(event);
+        event.preventDefault();
+        return false;
+      }
+    }
+
   </script>
   <title>zsv playground v0.0.1</title>
 </head>
@@ -512,8 +520,8 @@
                   onchange="handleFlag(event);" />
               </div>
               <span class="form-control input-group-text w-50">-V,--value</span>
-              <input id="flag_Vvalue_value" type="text" class="form-control" placeholder="value"
-                onkeyup="handleFlagValue(event);" />
+              <input id="flag_Vvalue_value" type="text" class="form-control" placeholder="<value>"
+                onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />
             </div>
           </div>
         </div>
@@ -535,7 +543,7 @@
         </div>
         <div class="col">
           <label for="result" class="form-label">Result</label>
-          <textarea id="result" class="form-control" readonly></textarea>
+          <textarea id="result" class="form-control bg-light" readonly></textarea>
         </div>
       </div>
     </form>
