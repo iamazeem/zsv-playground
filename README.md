@@ -62,7 +62,7 @@ To build it locally:
   improvement.
 - Some commands require multiple files as input.
   - This is currently not supported but may be added later.
-- The user input is not cached at the moment to avoid duplicate runs.
+- To avoid duplicate runs, there is no caching at the moment.
 
 ## License
 
