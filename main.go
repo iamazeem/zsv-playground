@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,11 +11,6 @@ import (
 	"os/signal"
 	"time"
 )
-
-type data struct {
-	PlaygroundVersion string
-	ZsvVersions       []string
-}
 
 var (
 	//go:embed templates/index.html
@@ -41,30 +37,42 @@ func main() {
 	zsvExePaths := getZsvExePaths(zsvVersions)
 	log.Printf("cached zsv binaries: %v", zsvExePaths)
 
-	zsvCLI, ok := loadCLIForAllZsvVersions(zsvVersions)
+	clis, ok := loadCLIs(zsvVersions)
 	if !ok {
 		log.Fatalf("failed to load CLI for all zsv versions")
 	}
 
-	for version, subcommands := range zsvCLI {
-		log.Printf("listing all commands with flags for %v", version)
-		log.Print(subcommands)
+	clisJson, err := json.Marshal(clis)
+	if err != nil {
+		log.Fatalf("failed to marshal CLIs to JSON, error: %v", err)
 	}
+
+	clisJsonStr := string(clisJson)
+	log.Print(clisJsonStr)
 
 	templates, err := template.ParseFS(templatesFS, "templates/index.html")
 	if err != nil {
 		log.Fatalf("failed to parse templates, %v", err)
 	}
 
-	d := data{
+	data := struct {
+		PlaygroundVersion string
+		ZsvVersions       []string
+		ZsvCLIsJson       string
+	}{
 		PlaygroundVersion: version,
 		ZsvVersions:       zsvVersions,
+		ZsvCLIsJson:       clisJsonStr,
 	}
 
 	http.Handle("/static/", http.FileServer(http.FS(staticFS)))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		templates.ExecuteTemplate(w, "index.html", d)
+		err := templates.ExecuteTemplate(w, "index.html", data)
+		if err != nil {
+			log.Print(err)
+			http.NotFound(w, r)
+		}
 	})
 
 	// start http server and wait for SIGINT

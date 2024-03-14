@@ -14,7 +14,7 @@
     }
   </style>
   <script>
-    const zsv = '{{ .Zsv }}';
+    const zsv = JSON.parse('{{ .ZsvCLIsJson }}');
 
     function populateCommands(event) {
       document.getElementById("commands").innerHTML = "";
@@ -198,7 +198,7 @@
       <div class="row mb-3 flex-nowrap">
         <!-- commands -->
         <div class="col-3">
-          <select id="command" class="form-select overflow-auto" size="7" required onchange="handleCommand();">
+          <select id="commands" class="form-select overflow-auto" size="7" required onchange="handleCommand();">
           </select>
         </div>
 
