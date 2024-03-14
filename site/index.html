@@ -14,309 +14,7 @@
     }
   </style>
   <script>
-    const zsv = {
-      "v0.3.8-alpha": {
-        "global_flags": [
-          { "name": "-L,--limit-rows", "argument": "<n>" },
-          { "name": "-c,--max-column-count", "argument": "<n>" },
-          { "name": "-r,--max-row-size", "argument": "<n>" },
-          { "name": "-B,--buff-size", "argument": "<n>" },
-          { "name": "-t,--tab-delim" },
-          { "name": "-O,--other-delim", "argument": "<char>" },
-          { "name": "-q,--no-quote" },
-          { "name": "-R,--skip-head", "argument": "<n>" },
-          { "name": "-d,--header-row-span", "argument": "<n>" },
-          { "name": "-u,--malformed-utf8-replacement", "argument": "<replacement_string>" },
-          { "name": "-S,--keep-blank-headers" },
-          { "name": "-0,--header-row", "argument": "<header>" },
-          { "name": "-v,--verbose" }
-        ],
-        "commands": [
-          {
-            "name": "sql",
-            "flags": [
-              {
-                "name": "--join-indexes",
-                "argument": "<n1...>"
-              },
-              {
-                "name": "-b"
-              },
-              {
-                "name": "-C,--max-cols",
-                "argument": "<n>"
-              },
-              {
-                "name": "--memory"
-              }
-            ]
-          },
-          { "name": "count", "flags": [] },
-          {
-            "name": "desc",
-            "flags": [
-              {
-                "name": "-b,--with-bom"
-              },
-              {
-                "name": "-C",
-                "argument": "<maximum_number_of_columns>"
-              },
-              {
-                "name": "-H"
-              },
-              {
-                "name": "-q,--quick"
-              },
-              {
-                "name": "-a,--all"
-              }
-            ]
-          },
-          {
-            "name": "pretty",
-            "flags": [
-              {
-                "name": "-W,--width",
-                "argument": "<n>"
-              },
-              {
-                "name": "-p,--rows"
-              },
-              {
-                "name": "-C,--max-col-width",
-                "argument": "<n>"
-              },
-              {
-                "name": "-D,--min-col-width",
-                "argument": "<n>"
-              },
-              {
-                "name": "-A,--no-align"
-              },
-              {
-                "name": "-m,--markdown"
-              },
-              {
-                "name": "-M,--markdown-pad"
-              },
-              {
-                "name": "-H,--ignore-header-lengths"
-              }
-            ]
-          },
-          {
-            "name": "2json",
-            "flags": [
-              {
-                "name": "--compact"
-              },
-              {
-                "name": "--from-db"
-              },
-              {
-                "name": "--db-table",
-                "argument": "<table_name>"
-              },
-              {
-                "name": "--object"
-              },
-              {
-                "name": "--no-empty"
-              },
-              {
-                "name": "--database"
-              },
-              {
-                "name": "--no-header"
-              },
-              {
-                "name": "--index",
-                "argument": "<name_on_expr>"
-              },
-              {
-                "name": "--unique-index",
-                "argument": "<name_on_expr>"
-              }
-            ]
-          },
-          {
-            "name": "stack",
-            "flags": [
-              {
-                "name": "-b"
-              },
-              {
-                "name": "-q"
-              },
-              {
-                "name": "-T"
-              }
-            ]
-          },
-          {
-            "name": "compare",
-            "flags": [
-              {
-                "name": "-k,--key",
-                "argument": "<field>"
-              },
-              {
-                "name": "-a,--add",
-                "argument": "<field>"
-              },
-              {
-                "name": "--sort"
-              },
-              {
-                "name": "--sort-in-memory"
-              },
-              {
-                "name": "--json"
-              },
-              {
-                "name": "--json-compact"
-              },
-              {
-                "name": "--json-object"
-              }
-            ]
-          },
-          {
-            "name": "echo",
-            "flags": [
-              {
-                "name": "-b"
-              },
-              {
-                "name": "--overwrite",
-                "argument": "<source>"
-              }
-            ]
-          },
-          {
-            "name": "flatten",
-            "flags": [
-              {
-                "name": "-b"
-              },
-              {
-                "name": "-v,--verbose"
-              },
-              {
-                "name": "-C",
-                "argument": "<max_columns_to_output>"
-              },
-              {
-                "name": "-m",
-                "argument": "<max_rows_per_aggregation>"
-              },
-              {
-                "name": "--row-id",
-                "argument": "<row_id_column_name>"
-              },
-              {
-                "name": "--col-name",
-                "argument": "<column_id_column_name>"
-              },
-              {
-                "name": "-V",
-                "argument": "<value_column_name>"
-              }
-            ]
-          },
-          { "name": "2tsv", "flags": [] },
-          {
-            "name": "serialize",
-            "flags": [
-              {
-                "name": "-b"
-              },
-              {
-                "name": "-f,--filter",
-                "argument": "<value>"
-              },
-              {
-                "name": "-e,--entire"
-              },
-              {
-                "name": "-i,--case-insensitive"
-              },
-              {
-                "name": "-p,--position"
-              },
-              {
-                "name": "-a,--add",
-                "argument": "<column_name>"
-              }
-            ]
-          },
-          {
-            "name": "select",
-            "flags": [
-              {
-                "name": "-b,--with-bom"
-              },
-              {
-                "name": "--fixed",
-                "argument": "<offset1,offset2,..>"
-              },
-              {
-                "name": "--fixed-auto"
-              },
-              {
-                "name": "-H,--head",
-                "argument": "<n>"
-              },
-              {
-                "name": "-s,--search",
-                "argument": "<value>"
-              },
-              {
-                "name": "--sample-every",
-                "argument": "<num_of_rows>"
-              },
-              {
-                "name": "--sample-pct",
-                "argument": "<percentage>"
-              },
-              {
-                "name": "--distinct"
-              },
-              {
-                "name": "--merge"
-              },
-              {
-                "name": "-e",
-                "argument": "<embedded_lineend_char>"
-              },
-              {
-                "name": "-x",
-                "argument": "<column>"
-              },
-              {
-                "name": "-N,--line-number"
-              },
-              {
-                "name": "-n"
-              },
-              {
-                "name": "--unescape"
-              },
-              {
-                "name": "-w,--whitespace-clean"
-              },
-              {
-                "name": "--whitespace-clean-no-newline"
-              },
-              {
-                "name": "-W,--no-trim"
-              }
-            ]
-          }
-        ]
-      }
-    };
+    const zsv = JSON.parse('{"v0.3.6-alpha":{"global_flags":[{"name":"-L,--limit-rows","argument":"\u003cn\u003e"},{"name":"-c,--max-column-count","argument":"\u003cn\u003e"},{"name":"-r,--max-row-size","argument":"\u003cn\u003e"},{"name":"-B,--buff-size","argument":"\u003cn\u003e"},{"name":"-t,--tab-delim"},{"name":"-O,--other-delim","argument":"\u003cchar\u003e"},{"name":"-q,--no-quote"},{"name":"-R,--skip-head","argument":"\u003cn\u003e"},{"name":"-d,--header-row-span","argument":"\u003cn\u003e"},{"name":"-u,--malformed-utf8-replacement","argument":"\u003creplacement_string\u003e"},{"name":"-S,--keep-blank-headers"},{"name":"-0,--header-row","argument":"\u003cheader\u003e"},{"name":"-v,--verbose"}],"commands":[{"name":"select","flags":[{"name":"-b,--with-bom"},{"name":"--fixed","argument":"\u003coffset1,offset2,..\u003e"},{"name":"--fixed-auto"},{"name":"-H,--head","argument":"\u003cn\u003e"},{"name":"-s,--search","argument":"\u003cvalue\u003e"},{"name":"--sample-every","argument":"\u003cnum_of_rows\u003e"},{"name":"--sample-pct","argument":"\u003cpercentage\u003e"},{"name":"--distinct"},{"name":"--merge"},{"name":"-e","argument":"\u003cembedded_lineend_char\u003e"},{"name":"-x","argument":"\u003ccolumn\u003e"},{"name":"-N,--line-number"},{"name":"-n"},{"name":"--unescape"},{"name":"-w,--whitespace-clean"},{"name":"--whitespace-clean-no-newline"},{"name":"-W,--no-trim"}]},{"name":"echo","flags":[{"name":"-b"},{"name":"--overwrite","argument":"\u003csource\u003e"}]},{"name":"sql","flags":[{"name":"--join-indexes","argument":"\u003cn1...\u003e"},{"name":"-b"},{"name":"-C,--max-cols","argument":"\u003cn\u003e"},{"name":"--memory"}]},{"name":"count"},{"name":"desc","flags":[{"name":"-b,--with-bom"},{"name":"-C","argument":"\u003cmaximum_number_of_columns\u003e"},{"name":"-H"},{"name":"-q,--quick"},{"name":"-a,--all"}]},{"name":"pretty","flags":[{"name":"-W,--width","argument":"\u003cn\u003e"},{"name":"-p,--rows"},{"name":"-C,--max-col-width","argument":"\u003cn\u003e"},{"name":"-D,--min-col-width","argument":"\u003cn\u003e"},{"name":"-A,--no-align"},{"name":"-m,--markdown"},{"name":"-M,--markdown-pad"},{"name":"-H,--ignore-header-lengths"}]},{"name":"flatten","flags":[{"name":"-b"},{"name":"-v,--verbose"},{"name":"-C","argument":"\u003cmax_columns_to_output\u003e"},{"name":"-m","argument":"\u003cmax_rows_per_aggregation\u003e"},{"name":"--row-id","argument":"\u003crow_id_column_name\u003e"},{"name":"--col-name","argument":"\u003ccolumn_id_column_name\u003e"},{"name":"-V","argument":"\u003cvalue_column_name\u003e"}]},{"name":"2json","flags":[{"name":"--compact"},{"name":"--from-db"},{"name":"--db-table","argument":"\u003ctable_name\u003e"},{"name":"--object"},{"name":"--no-empty"},{"name":"--database"},{"name":"--no-header"},{"name":"--index","argument":"\u003cname_on_expr\u003e"},{"name":"--unique-index","argument":"\u003cname_on_expr\u003e"}]},{"name":"2tsv"},{"name":"serialize","flags":[{"name":"-b"},{"name":"-f,--filter","argument":"\u003cvalue\u003e"},{"name":"-e,--entire"},{"name":"-i,--case-insensitive"},{"name":"-p,--position"},{"name":"-a,--add","argument":"\u003ccolumn_name\u003e"}]},{"name":"stack","flags":[{"name":"-b"},{"name":"-q"},{"name":"-T"}]},{"name":"compare","flags":[{"name":"-k,--key","argument":"\u003cfield\u003e"},{"name":"-a,--add","argument":"\u003cfield\u003e"},{"name":"--sort"},{"name":"--sort-in-memory"},{"name":"--json"},{"name":"--json-compact"},{"name":"--json-object"}]}]},"v0.3.7-alpha":{"global_flags":[{"name":"-L,--limit-rows","argument":"\u003cn\u003e"},{"name":"-c,--max-column-count","argument":"\u003cn\u003e"},{"name":"-r,--max-row-size","argument":"\u003cn\u003e"},{"name":"-B,--buff-size","argument":"\u003cn\u003e"},{"name":"-t,--tab-delim"},{"name":"-O,--other-delim","argument":"\u003cchar\u003e"},{"name":"-q,--no-quote"},{"name":"-R,--skip-head","argument":"\u003cn\u003e"},{"name":"-d,--header-row-span","argument":"\u003cn\u003e"},{"name":"-u,--malformed-utf8-replacement","argument":"\u003creplacement_string\u003e"},{"name":"-S,--keep-blank-headers"},{"name":"-0,--header-row","argument":"\u003cheader\u003e"},{"name":"-v,--verbose"}],"commands":[{"name":"select","flags":[{"name":"-b,--with-bom"},{"name":"--fixed","argument":"\u003coffset1,offset2,..\u003e"},{"name":"--fixed-auto"},{"name":"-H,--head","argument":"\u003cn\u003e"},{"name":"--no-header"},{"name":"--prepend-header","argument":"\u003cvalue\u003e"},{"name":"-s,--search","argument":"\u003cvalue\u003e"},{"name":"--sample-every","argument":"\u003cnum_of_rows\u003e"},{"name":"--sample-pct","argument":"\u003cpercentage\u003e"},{"name":"--distinct"},{"name":"--merge"},{"name":"-e","argument":"\u003cembedded_lineend_char\u003e"},{"name":"-x","argument":"\u003ccolumn\u003e"},{"name":"-N,--line-number"},{"name":"-n"},{"name":"--unescape"},{"name":"-w,--whitespace-clean"},{"name":"--whitespace-clean-no-newline"},{"name":"-W,--no-trim"}]},{"name":"echo","flags":[{"name":"-b"},{"name":"--overwrite","argument":"\u003csource\u003e"}]},{"name":"sql","flags":[{"name":"--join-indexes","argument":"\u003cn1...\u003e"},{"name":"-b"},{"name":"-C,--max-cols","argument":"\u003cn\u003e"},{"name":"--memory"}]},{"name":"count"},{"name":"desc","flags":[{"name":"-b,--with-bom"},{"name":"-C","argument":"\u003cmaximum_number_of_columns\u003e"},{"name":"-H"},{"name":"-q,--quick"},{"name":"-a,--all"}]},{"name":"pretty","flags":[{"name":"-W,--width","argument":"\u003cn\u003e"},{"name":"-p,--rows"},{"name":"-C,--max-col-width","argument":"\u003cn\u003e"},{"name":"-D,--min-col-width","argument":"\u003cn\u003e"},{"name":"-A,--no-align"},{"name":"-m,--markdown"},{"name":"-M,--markdown-pad"},{"name":"-H,--ignore-header-lengths"}]},{"name":"flatten","flags":[{"name":"-b"},{"name":"-v,--verbose"},{"name":"-C","argument":"\u003cmax_columns_to_output\u003e"},{"name":"-m","argument":"\u003cmax_rows_per_aggregation\u003e"},{"name":"--row-id","argument":"\u003crow_id_column_name\u003e"},{"name":"--col-name","argument":"\u003ccolumn_id_column_name\u003e"},{"name":"-V","argument":"\u003cvalue_column_name\u003e"}]},{"name":"2json","flags":[{"name":"--compact"},{"name":"--from-db"},{"name":"--db-table","argument":"\u003ctable_name\u003e"},{"name":"--object"},{"name":"--no-empty"},{"name":"--database"},{"name":"--no-header"},{"name":"--index","argument":"\u003cname_on_expr\u003e"},{"name":"--unique-index","argument":"\u003cname_on_expr\u003e"}]},{"name":"2tsv"},{"name":"serialize","flags":[{"name":"-b"},{"name":"-f,--filter","argument":"\u003cvalue\u003e"},{"name":"-e,--entire"},{"name":"-i,--case-insensitive"},{"name":"-p,--position"},{"name":"-a,--add","argument":"\u003ccolumn_name\u003e"}]},{"name":"stack","flags":[{"name":"-b"},{"name":"-q"},{"name":"-T"}]},{"name":"compare","flags":[{"name":"-k,--key","argument":"\u003cfield\u003e"},{"name":"-a,--add","argument":"\u003cfield\u003e"},{"name":"--sort"},{"name":"--sort-in-memory"},{"name":"--json"},{"name":"--json-compact"},{"name":"--json-object"}]}]},"v0.3.8-alpha":{"global_flags":[{"name":"-L,--limit-rows","argument":"\u003cn\u003e"},{"name":"-c,--max-column-count","argument":"\u003cn\u003e"},{"name":"-r,--max-row-size","argument":"\u003cn\u003e"},{"name":"-B,--buff-size","argument":"\u003cn\u003e"},{"name":"-t,--tab-delim"},{"name":"-O,--other-delim","argument":"\u003cchar\u003e"},{"name":"-q,--no-quote"},{"name":"-R,--skip-head","argument":"\u003cn\u003e"},{"name":"-d,--header-row-span","argument":"\u003cn\u003e"},{"name":"-u,--malformed-utf8-replacement","argument":"\u003creplacement_string\u003e"},{"name":"-S,--keep-blank-headers"},{"name":"-0,--header-row","argument":"\u003cheader\u003e"},{"name":"-v,--verbose"}],"commands":[{"name":"select","flags":[{"name":"-b,--with-bom"},{"name":"--fixed","argument":"\u003coffset1,offset2,..\u003e"},{"name":"--fixed-auto"},{"name":"-H,--head","argument":"\u003cn\u003e"},{"name":"--no-header"},{"name":"--prepend-header","argument":"\u003cvalue\u003e"},{"name":"-s,--search","argument":"\u003cvalue\u003e"},{"name":"--sample-every","argument":"\u003cnum_of_rows\u003e"},{"name":"--sample-pct","argument":"\u003cpercentage\u003e"},{"name":"--distinct"},{"name":"--merge"},{"name":"-e","argument":"\u003cembedded_lineend_char\u003e"},{"name":"-x","argument":"\u003ccolumn\u003e"},{"name":"-N,--line-number"},{"name":"-n"},{"name":"--unescape"},{"name":"-w,--whitespace-clean"},{"name":"--whitespace-clean-no-newline"},{"name":"-W,--no-trim"}]},{"name":"echo","flags":[{"name":"-b"},{"name":"--overwrite","argument":"\u003csource\u003e"}]},{"name":"sql","flags":[{"name":"--join-indexes","argument":"\u003cn1...\u003e"},{"name":"-b"},{"name":"-C,--max-cols","argument":"\u003cn\u003e"},{"name":"--memory"}]},{"name":"count"},{"name":"desc","flags":[{"name":"-b,--with-bom"},{"name":"-C","argument":"\u003cmaximum_number_of_columns\u003e"},{"name":"-H"},{"name":"-q,--quick"},{"name":"-a,--all"}]},{"name":"pretty","flags":[{"name":"-W,--width","argument":"\u003cn\u003e"},{"name":"-p,--rows"},{"name":"-C,--max-col-width","argument":"\u003cn\u003e"},{"name":"-D,--min-col-width","argument":"\u003cn\u003e"},{"name":"-A,--no-align"},{"name":"-m,--markdown"},{"name":"-M,--markdown-pad"},{"name":"-H,--ignore-header-lengths"}]},{"name":"flatten","flags":[{"name":"-b"},{"name":"-v,--verbose"},{"name":"-C","argument":"\u003cmax_columns_to_output\u003e"},{"name":"-m","argument":"\u003cmax_rows_per_aggregation\u003e"},{"name":"--row-id","argument":"\u003crow_id_column_name\u003e"},{"name":"--col-name","argument":"\u003ccolumn_id_column_name\u003e"},{"name":"-V","argument":"\u003cvalue_column_name\u003e"}]},{"name":"2json","flags":[{"name":"--compact"},{"name":"--from-db"},{"name":"--db-table","argument":"\u003ctable_name\u003e"},{"name":"--object"},{"name":"--no-empty"},{"name":"--database"},{"name":"--no-header"},{"name":"--index","argument":"\u003cname_on_expr\u003e"},{"name":"--unique-index","argument":"\u003cname_on_expr\u003e"}]},{"name":"2tsv"},{"name":"serialize","flags":[{"name":"-b"},{"name":"-f,--filter","argument":"\u003cvalue\u003e"},{"name":"-e,--entire"},{"name":"-i,--case-insensitive"},{"name":"--id-column","argument":"\u003cn\u003e"},{"name":"-p,--position"},{"name":"-a,--add","argument":"\u003ccolumn_name\u003e"}]},{"name":"stack","flags":[{"name":"-b"},{"name":"-q"},{"name":"-T"}]},{"name":"compare","flags":[{"name":"-k,--key","argument":"\u003cfield\u003e"},{"name":"-a,--add","argument":"\u003cfield\u003e"},{"name":"--sort"},{"name":"--sort-in-memory"},{"name":"--json"},{"name":"--json-compact"},{"name":"--json-object"}]}]}}');
 
     function populateCommands(event) {
       document.getElementById("commands").innerHTML = "";
@@ -367,20 +65,23 @@
       }
 
       const commands = zsv[version]["commands"];
-      for (let flag of commands.find(cmd => cmd.name === command)["flags"]) {
-        const id = normalizeFlagName(flag.name);
-        var f = `
-          <div class="input-group mb-0">
-            <div class="input-group-text">
-              <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
-            </div>
-            <span class="form-control input-group-text w-50">${flag.name}</span>
-        `;
-        if (flag.argument !== undefined) {
-          f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
+      const commandFound = commands.find(cmd => cmd.name === command);
+      if (commandFound["flags"] !== undefined) {
+        for (let flag of commandFound["flags"]) {
+          const id = normalizeFlagName(flag.name);
+          var f = `
+            <div class="input-group mb-0">
+              <div class="input-group-text">
+                <input id="flag_${id}" value="${flag.name}" class="form-check-input" type="checkbox" onchange="handleFlag(event);" />
+              </div>
+              <span class="form-control input-group-text w-50">${flag.name}</span>
+          `;
+          if (flag.argument !== undefined) {
+            f += `<input id="flag_${id}_value" type="text" class="form-control" placeholder="${flag.argument}" onkeyup="handleFlagValue(event);" onkeydown="handleKeyDown(event);" />`;
+          }
+          f += '</div>';
+          flagsHTML.push(f);
         }
-        f += '</div>';
-        flagsHTML.push(f);
       }
       document.getElementById("flags").innerHTML = flagsHTML.join("");
     }
@@ -467,7 +168,6 @@
 
     function handleKeyDown(event) {
       if (event.code === "Space") {
-        console.log(event);
         event.preventDefault();
         return false;
       }
