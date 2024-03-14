@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
+	"strings"
 	"time"
 )
 
@@ -73,6 +75,38 @@ func main() {
 			log.Print(err)
 			http.NotFound(w, r)
 		}
+	})
+
+	http.HandleFunc("/run", func(w http.ResponseWriter, r *http.Request) {
+		log.Print(*r)
+		if err := r.ParseForm(); err != nil {
+			log.Printf("failed to parse form, error: %v", err)
+			w.Write([]byte("Failure!"))
+			return
+		}
+
+		version := r.FormValue("version")
+		cli := r.FormValue("cli")
+		csv := r.FormValue("csv")
+
+		log.Printf("version: [%v]", version)
+		log.Printf("cli: [%v]", cli)
+		log.Printf("csv: [%v]", csv)
+
+		zsv := getZsvExePath(version)
+		cli = strings.Replace(cli, "zsv", zsv, 1)
+		log.Printf("executing: %v", cli)
+
+		cmd := exec.Command(zsv, strings.Fields(cli)[1:]...)
+		cmd.Stdin = strings.NewReader(csv);
+		output, err := cmd.Output()
+		if err != nil {
+			log.Printf("failed to execute command, error: %v", err)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
 	})
 
 	// start http server and wait for SIGINT

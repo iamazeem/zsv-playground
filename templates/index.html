@@ -172,6 +172,10 @@
         return false;
       }
     }
+
+    document.getElementById('form').addEventListener('htmx:sendError', function (event) {
+      document.getElementById('result').innerHTML = event.detail.error;
+    });
   </script>
   <title>zsv playground {{ .PlaygroundVersion }}</title>
 </head>
@@ -182,21 +186,22 @@
       <span class="badge badge-secondary">{{ .PlaygroundVersion }}</span>
     </div>
 
-    <!-- version -->
-    <div class="row mt-4 mb-4 text-center">
-      <div class="col-12">
-        <select id="version" class="form-select w-25 mx-auto text-center" required onchange="populateCommands(event);">
-          {{- if .ZsvVersions }}
-          <option value="" selected>Select zsv version</option>
-          {{- range .ZsvVersions }}
-          <option value="{{ . }}">zsv {{ . }}</option>
-          {{- end }}
-          {{- end }}
-        </select>
+    <form id="form" class="form" hx-post="/run" hx-target="#result">
+      <!-- version -->
+      <div class="row mt-4 mb-4 text-center">
+        <div class="col-12">
+          <select id="version" name="version" class="form-select w-25 mx-auto text-center" required
+            onchange="populateCommands(event);">
+            {{- if .ZsvVersions }}
+            <option value="" selected>Select zsv version</option>
+            {{- range .ZsvVersions }}
+            <option value="{{ . }}">zsv {{ . }}</option>
+            {{- end }}
+            {{- end }}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <form id="form" class="form" method="post" action="#">
       <div class="row mb-3 flex-nowrap">
         <!-- commands -->
         <div class="col-3">
@@ -214,8 +219,8 @@
       <!-- cli -->
       <div class="row">
         <div class="input-group">
-          <input id="cli" type="text" class="form-control bg-light" value="zsv" readonly />
-          <button id="run" class="btn btn-outline-primary" type="submit">Run</button>
+          <input id="cli" name="cli" type="text" class="form-control bg-light" value="zsv" readonly />
+          <button class="btn btn-outline-primary" type="submit">Run</button>
         </div>
       </div>
 
@@ -223,7 +228,7 @@
       <div class="row mt-3">
         <div class="col">
           <label for="csv" class="form-label">CSV</label>
-          <textarea id="csv" class="form-control" required></textarea>
+          <textarea id="csv" name="csv" class="form-control" required></textarea>
         </div>
         <div class="col">
           <label for="result" class="form-label">Result</label>
