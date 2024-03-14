@@ -33,7 +33,7 @@ Go to http://localhost:8080/ in your browser.
 - The user inputs the CSV, selects a command, chooses the required flags, and
   hits `Run`.
 - The generated user CLI is run by the backend and the output is shown under
-  `Results`.
+  `Result`.
 
 ### Demo
 
