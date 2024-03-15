@@ -30,15 +30,31 @@ jobs:
       with:
         go-version: '1.21.4'
 
+    - name: Get tag and set version on release
+      if: startsWith(github.ref, 'refs/tags/v')
+      env:
+        TAG: '${{ github.ref_name }}'
+      run: |
+        echo "TAG: $TAG"
+        sed "s|version = \"v.*\"|version = \"$TAG\"|" -i version.go
+        cat -n version.go
+
     - name: Build
       run: go build -v ./...
 
-    - name: Check executable
+    - name: Check
       run: ls -hl zsv-playground
 
-    - name: Upload zsv-playground
+    - name: Upload
       uses: actions/upload-artifact@v4
       with:
         name: zsv-playground
         path: ./zsv-playground
         if-no-files-found: error
+
+    - name: Upload with release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: |
+          ./zsv-playground
