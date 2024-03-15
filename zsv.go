@@ -45,7 +45,7 @@ func loadCLIs(versions []string) (ZsvCLIs, bool) {
 func loadCLI(version string) (ZsvCLI, bool) {
 	log.Printf("loading CLI [%v]", version)
 
-	zsv := getZsvExePath(version)
+	zsv := getExePath(version)
 	globalFlags, commandList, ok := loadGlobalFlagsAndCommands(zsv)
 	if !ok {
 		log.Print("failed to parse 'zsv help' command")

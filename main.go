@@ -31,14 +31,14 @@ func init() {
 func main() {
 	log.Printf("starting zsv playground [%v]", version)
 
-	zsvVersions, err := setupZsvCache()
+	zsvVersions, err := setupCache()
 	if err != nil {
 		log.Fatalf("failed to set up zsv cache, %v", err)
 	}
 
 	log.Printf("cached zsv versions: %v", zsvVersions)
 
-	zsvExePaths := getZsvExePaths(zsvVersions)
+	zsvExePaths := getExePaths(zsvVersions)
 	log.Printf("cached zsv binaries: %v", zsvExePaths)
 
 	clis, ok := loadCLIs(zsvVersions)
@@ -99,7 +99,7 @@ func main() {
 		// log.Printf("[%v] cli: [%v]", peer, cli)
 		// log.Printf("[%v] csv: [%v]", peer, csv)
 
-		zsv := getZsvExePath(version)
+		zsv := getExePath(version)
 		cli = strings.Replace(cli, "zsv", zsv, 1)
 		log.Printf("[%v] executing: [%v]", peer, cli)
 

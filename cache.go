@@ -15,7 +15,7 @@ import (
 	"github.com/google/go-github/v60/github"
 )
 
-func initZsvCache() bool {
+func initCache() bool {
 	log.Println("initializing cache")
 
 	log.Printf("checking cache directory [%v]", cacheDir)
@@ -35,7 +35,7 @@ func initZsvCache() bool {
 	return true
 }
 
-func loadZsvCache() (map[string]int64, bool) {
+func loadCache() (map[string]int64, bool) {
 	log.Println("loading cache")
 
 	entries, err := os.ReadDir(cacheDir)
@@ -66,7 +66,7 @@ func loadZsvCache() (map[string]int64, bool) {
 	return cache, true
 }
 
-func cleanZsvCache(tags map[string]bool) bool {
+func cleanCache(tags map[string]bool) bool {
 	log.Printf("cleaning cache")
 
 	entries, err := os.ReadDir(cacheDir)
@@ -104,14 +104,14 @@ func cleanZsvCache(tags map[string]bool) bool {
 	return true
 }
 
-func setupZsvCache() ([]string, error) {
+func setupCache() ([]string, error) {
 	log.Printf("setting up zsv cache")
 
-	if !initZsvCache() {
+	if !initCache() {
 		return nil, fmt.Errorf("failed to set up cache")
 	}
 
-	c, ok := loadZsvCache()
+	c, ok := loadCache()
 	if !ok {
 		return nil, fmt.Errorf("failed to load cache")
 	}
@@ -187,7 +187,7 @@ func setupZsvCache() ([]string, error) {
 		}
 	}
 
-	if !cleanZsvCache(requiredCacheContents) {
+	if !cleanCache(requiredCacheContents) {
 		log.Printf("failed to clean cache")
 	}
 
@@ -239,14 +239,14 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 	}
 }
 
-func getZsvExePath(version string) string {
+func getExePath(version string) string {
 	return fmt.Sprintf("%v/%v/%v/bin/zsv", cacheDir, version, triplet)
 }
 
-func getZsvExePaths(versions []string) []string {
+func getExePaths(versions []string) []string {
 	bins := []string{}
 	for _, v := range versions {
-		zsv := getZsvExePath(v)
+		zsv := getExePath(v)
 		bins = append(bins, zsv)
 	}
 	return bins
