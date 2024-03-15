@@ -246,15 +246,14 @@
 
       <!-- input and output -->
       <div class="row mt-3">
-        <div class="col">
+        <div class="col-6">
           <label for="csv" class="form-label">CSV</label>
-          <textarea id="csv" name="csv" class="form-control" style="height: 400px; resize: none; white-space: nowrap;"
-            required></textarea>
+          <textarea id="csv" name="csv" class="form-control"
+            style="height: 400px; max-height: 400px; resize: none; white-space: nowrap;" required></textarea>
         </div>
-        <div class="col">
+        <div class="col-6">
           <label for="result" class="form-label">Result</label>
-          <textarea id="result" class="form-control bg-light" style="height: 400px; resize: none; white-space: nowrap;"
-            readonly></textarea>
+          <pre id="result" class="form-control bg-light overflow-auto" style="height: 400px; resize: none;"></pre>
         </div>
       </div>
     </form>
