@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"fmt"
 	"html"
 	"html/template"
 	"log"
@@ -100,18 +101,23 @@ func main() {
 
 		zsv := getZsvExePath(version)
 		cli = strings.Replace(cli, "zsv", zsv, 1)
-		log.Printf("[%v] executing: %v", peer, cli)
+		log.Printf("[%v] executing: [%v]", peer, cli)
+
+		start := time.Now()
 
 		cmd := exec.Command("sh", "-c", cli)
 		cmd.Stdin = strings.NewReader(csv)
 		output, err := cmd.CombinedOutput()
+
+		elapsedTimeMsg := fmt.Sprintf("\n\n(elapsed time: %v)", time.Since(start))
+
 		escapedOutput := html.EscapeString(string(output))
 		if err != nil {
 			log.Printf("[%v] failed to execute command, error: %v", peer, err)
 			if !strings.HasSuffix(escapedOutput, "\n") {
 				escapedOutput += "\n"
 			}
-			if _, err := w.Write([]byte(escapedOutput + err.Error())); err != nil {
+			if _, err := w.Write([]byte(escapedOutput + err.Error() + elapsedTimeMsg)); err != nil {
 				log.Printf("[%v] failed to send 'execution failed' response", peer)
 			}
 			return
@@ -119,7 +125,7 @@ func main() {
 
 		// log.Printf("[%v] output: [%v]", peer, string(output))
 		log.Printf("[%v] sending response [size: %v bytes]", peer, len(escapedOutput))
-		if n, err := w.Write([]byte(escapedOutput)); err != nil {
+		if n, err := w.Write([]byte(escapedOutput + elapsedTimeMsg)); err != nil {
 			log.Printf("[%v] failed to send response", peer)
 		} else {
 			log.Printf("[%v] sent response successfully [%v]", peer, n)
