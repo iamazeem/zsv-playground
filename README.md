@@ -1,5 +1,7 @@
 # zsv-playground
 
+[![ci](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml)
+
 [`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a PoC for
 [`zsv`](https://github.com/liquidaty/zsv).
 
