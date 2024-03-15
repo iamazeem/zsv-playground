@@ -3,7 +3,7 @@
 [`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a PoC for
 [`zsv`](https://github.com/liquidaty/zsv).
 
-Currently, it only works on Linux.
+Currently, it is under active development and only works on Linux.
 
 ## Download
 
@@ -52,8 +52,9 @@ To build it locally:
 >
 > `zsv-playground` itself statically serves [Bootstrap
 > v5.3.3](https://getbootstrap.com/docs/5.3/getting-started/introduction/) (CSS
-> only) for UI with some JavaScript for input validation and for a better UX.
-> The only thing that it downloads to work with is `zsv`.
+> only) for UI, [HTMX v1.9.10](https://htmx.org/) to communicate with server,
+> and some JavaScript for input validation for a better UX. The only thing that
+> it downloads to work with is `zsv`.
 
 ## Limitations
 
