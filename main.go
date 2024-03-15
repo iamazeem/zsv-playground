@@ -78,10 +78,14 @@ func main() {
 	})
 
 	http.HandleFunc("/run", func(w http.ResponseWriter, r *http.Request) {
-		log.Print(*r)
+		peer := r.RemoteAddr
+
+		log.Printf("[%v] %v", peer, *r)
 		if err := r.ParseForm(); err != nil {
-			log.Printf("failed to parse form, error: %v", err)
-			w.Write([]byte("Failure!"))
+			log.Printf("[%v] failed to parse form, error: %v", peer, err)
+			if _, err := w.Write([]byte(err.Error())); err != nil {
+				log.Printf("[%v] failed to send 'parsing failed' response", peer)
+			}
 			return
 		}
 
@@ -89,24 +93,36 @@ func main() {
 		cli := r.FormValue("cli")
 		csv := r.FormValue("csv")
 
-		log.Printf("version: [%v]", version)
-		log.Printf("cli: [%v]", cli)
-		log.Printf("csv: [%v]", csv)
+		// log.Printf("[%v] version: [%v]", peer, version)
+		// log.Printf("[%v] cli: [%v]", peer, cli)
+		// log.Printf("[%v] csv: [%v]", peer, csv)
 
 		zsv := getZsvExePath(version)
 		cli = strings.Replace(cli, "zsv", zsv, 1)
-		log.Printf("executing: %v", cli)
+		log.Printf("[%v] executing: %v", peer, cli)
 
 		cmd := exec.Command("sh", "-c", cli)
 		cmd.Stdin = strings.NewReader(csv)
-		output, err := cmd.Output()
+		output, err := cmd.CombinedOutput()
 		if err != nil {
-			log.Printf("failed to execute command, error: %v", err)
-			w.Write([]byte(err.Error()))
+			log.Printf("[%v] failed to execute command, error: %v", peer, err)
+			outputStr := string(output)
+			if !strings.HasSuffix(outputStr, "\n") {
+				outputStr += "\n"
+			}
+			if _, err := w.Write([]byte(outputStr + err.Error())); err != nil {
+				log.Printf("[%v] failed to send 'execution failed' response", peer)
+			}
 			return
 		}
-		log.Printf("output: [%v]", string(output))
-		w.Write(output)
+
+		// log.Printf("[%v] output: [%v]", peer, string(output))
+		log.Printf("[%v] sending response [size: %v bytes]", peer, len(output))
+		if n, err := w.Write(output); err != nil {
+			log.Printf("[%v] failed to send response", peer)
+		} else {
+			log.Printf("[%v] sent response successfully [%v]", peer, n)
+		}
 	})
 
 	// start http server and wait for SIGINT
