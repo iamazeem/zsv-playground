@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"html"
 	"html/template"
 	"log"
 	"net/http"
@@ -104,21 +105,21 @@ func main() {
 		cmd := exec.Command("sh", "-c", cli)
 		cmd.Stdin = strings.NewReader(csv)
 		output, err := cmd.CombinedOutput()
+		escapedOutput := html.EscapeString(string(output))
 		if err != nil {
 			log.Printf("[%v] failed to execute command, error: %v", peer, err)
-			outputStr := string(output)
-			if !strings.HasSuffix(outputStr, "\n") {
-				outputStr += "\n"
+			if !strings.HasSuffix(escapedOutput, "\n") {
+				escapedOutput += "\n"
 			}
-			if _, err := w.Write([]byte(outputStr + err.Error())); err != nil {
+			if _, err := w.Write([]byte(escapedOutput + err.Error())); err != nil {
 				log.Printf("[%v] failed to send 'execution failed' response", peer)
 			}
 			return
 		}
 
 		// log.Printf("[%v] output: [%v]", peer, string(output))
-		log.Printf("[%v] sending response [size: %v bytes]", peer, len(output))
-		if n, err := w.Write(output); err != nil {
+		log.Printf("[%v] sending response [size: %v bytes]", peer, len(escapedOutput))
+		if n, err := w.Write([]byte(escapedOutput)); err != nil {
 			log.Printf("[%v] failed to send response", peer)
 		} else {
 			log.Printf("[%v] sent response successfully [%v]", peer, n)
