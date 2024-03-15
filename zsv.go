@@ -38,7 +38,7 @@ func loadCLIs(versions []string) (ZsvCLIs, bool) {
 		clis[version] = cli
 	}
 
-	log.Printf("loaded CLI for all zsv versions successfully")
+	log.Printf("loaded CLIs for all zsv versions successfully")
 	return clis, true
 }
 
@@ -148,7 +148,7 @@ func loadGlobalFlagsAndCommands(zsv string) ([]ZsvFlag, []string, bool) {
 
 	log.Printf("global flags: %v", globalFlags)
 	log.Printf("commands: %v", commands)
-	log.Print("load 'zsv help' command successfully")
+	log.Print("loaded 'zsv help' command successfully")
 	return globalFlags, commands, true
 }
 
