@@ -97,15 +97,15 @@ func main() {
 		cli = strings.Replace(cli, "zsv", zsv, 1)
 		log.Printf("executing: %v", cli)
 
-		cmd := exec.Command(zsv, strings.Fields(cli)[1:]...)
-		cmd.Stdin = strings.NewReader(csv);
+		cmd := exec.Command("sh", "-c", cli)
+		cmd.Stdin = strings.NewReader(csv)
 		output, err := cmd.Output()
 		if err != nil {
 			log.Printf("failed to execute command, error: %v", err)
 			w.Write([]byte(err.Error()))
 			return
 		}
-
+		log.Printf("output: [%v]", string(output))
 		w.Write(output)
 	})
 

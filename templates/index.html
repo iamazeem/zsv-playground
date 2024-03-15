@@ -10,7 +10,7 @@
     textarea {
       height: 400px;
       resize: none;
-      white-space: nowrap;
+      white-space: pre-wrap;
     }
   </style>
   <script>
@@ -173,9 +173,6 @@
       }
     }
 
-    document.getElementById('form').addEventListener('htmx:sendError', function (event) {
-      document.getElementById('result').innerHTML = event.detail.error;
-    });
   </script>
   <title>zsv playground {{ .PlaygroundVersion }}</title>
 </head>
