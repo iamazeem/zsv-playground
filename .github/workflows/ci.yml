@@ -32,3 +32,13 @@ jobs:
 
     - name: Build
       run: go build -v ./...
+
+    - name: Check executable
+      run: ls -hl zsv-playground
+
+    - name: Upload zsv-playground
+      uses: actions/upload-artifact@v4
+      with:
+        name: zsv-playground
+        path: ./zsv-playground
+        if-no-files-found: error
