@@ -54,7 +54,7 @@ To build it locally:
 > v5.3.3](https://getbootstrap.com/docs/5.3/getting-started/introduction/) (CSS
 > only) for UI, [HTMX v1.9.10](https://htmx.org/) to communicate with server,
 > and some JavaScript for input validation for a better UX. The only thing that
-> it downloads to work with is `zsv`.
+> it downloads is `zsv`.
 
 ## Limitations
 
