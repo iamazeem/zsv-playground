@@ -26,7 +26,7 @@ type ZsvCLI struct {
 type ZsvCLIs map[string]ZsvCLI
 
 func loadCLIs(versions []string) (ZsvCLIs, bool) {
-	log.Printf("loading CLIs for all zsv versions [%v]", versions)
+	log.Printf("loading CLIs for all zsv versions %v", versions)
 
 	clis := ZsvCLIs{}
 	for _, version := range versions {
@@ -43,7 +43,7 @@ func loadCLIs(versions []string) (ZsvCLIs, bool) {
 }
 
 func loadCLI(version string) (ZsvCLI, bool) {
-	log.Printf("loading zsv commands [%v]", version)
+	log.Printf("loading CLI [%v]", version)
 
 	zsv := getZsvExePath(version)
 	globalFlags, commandList, ok := loadGlobalFlagsAndCommands(zsv)
@@ -52,14 +52,14 @@ func loadCLI(version string) (ZsvCLI, bool) {
 		return ZsvCLI{}, false
 	}
 
-	log.Print("listing global flags")
-	for _, zsvFlag := range globalFlags {
-		if zsvFlag.Argument == "" {
-			log.Print(zsvFlag.Name)
-		} else {
-			log.Printf("%v | %v", zsvFlag.Name, zsvFlag.Argument)
-		}
-	}
+	// log.Print("listing global flags")
+	// for _, zsvFlag := range globalFlags {
+	// 	if zsvFlag.Argument == "" {
+	// 		log.Print(zsvFlag.Name)
+	// 	} else {
+	// 		log.Printf("%v | %v", zsvFlag.Name, zsvFlag.Argument)
+	// 	}
+	// }
 
 	commands := loadCommands(zsv, commandList)
 	log.Printf("loaded CLI successfully [%v]", version)
@@ -148,7 +148,8 @@ func loadGlobalFlagsAndCommands(zsv string) ([]ZsvFlag, []string, bool) {
 
 	log.Printf("global flags: %v", globalFlags)
 	log.Printf("commands: %v", commands)
-	log.Print("loaded 'zsv help' command successfully")
+
+	log.Print("loaded global flags and commands successfully")
 	return globalFlags, commands, true
 }
 
@@ -158,7 +159,7 @@ func loadCommands(zsv string, commandList []string) []ZsvCommand {
 	commands := []ZsvCommand{}
 
 	for _, command := range commandList {
-		log.Printf("command: %v", command)
+		// log.Printf("command: %v", command)
 		output, err := exec.Command(zsv, "help", command).Output()
 		if err != nil {
 			log.Printf("command: %v, error: %v", command, err)
@@ -176,17 +177,17 @@ func loadCommands(zsv string, commandList []string) []ZsvCommand {
 		commands = append(commands, ZsvCommand{Name: command, Flags: flags})
 	}
 
-	log.Printf("listing commands with flags: %v", commands)
-	for _, command := range commands {
-		log.Printf("command: %v", command)
-		for _, flag := range command.Flags {
-			if flag.Argument == "" {
-				log.Print(flag.Name)
-			} else {
-				log.Print(flag.Name, " | ", flag.Argument)
-			}
-		}
-	}
+	// log.Printf("listing commands with flags: %v", commands)
+	// for _, command := range commands {
+	// 	log.Printf("command: %v", command)
+	// 	for _, flag := range command.Flags {
+	// 		if flag.Argument == "" {
+	// 			log.Print(flag.Name)
+	// 		} else {
+	// 			log.Print(flag.Name, " | ", flag.Argument)
+	// 		}
+	// 	}
+	// }
 
 	log.Print("loaded all commands successfully")
 	return commands
