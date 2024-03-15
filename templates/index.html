@@ -173,6 +173,22 @@
       }
     }
 
+    // htmx.logger = function (elt, event, data) {
+    //   if (console) {
+    //     console.log(event, elt, data);
+    //   }
+    // };
+
+    window.addEventListener("DOMContentLoaded", (event) => {
+      const form = document.getElementById('form');
+      if (form) {
+        form.addEventListener('htmx:sendError', function (event) {
+          const error = "[ERR] Server error! Make sure server is up and running!";
+          console.error(error);
+          document.getElementById('result').innerText = error;
+        });
+      }
+    });
   </script>
   <title>zsv playground {{ .PlaygroundVersion }}</title>
 </head>
