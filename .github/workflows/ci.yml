@@ -48,7 +48,7 @@ jobs:
         if [[ $GITHUB_REF == "refs/tags/v"* ]]; then
           echo "VERSION=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
         else
-          echo "VERSION=$GITHUB_SHA" >> "$GITHUB_ENV"
+          echo "VERSION=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
         fi
 
     - name: Build (linux/amd64)
