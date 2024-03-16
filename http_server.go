@@ -23,7 +23,7 @@ var (
 	staticFS embed.FS
 )
 
-func startHTTPServer(zsvVersions []string, zsvCLIsJson string) {
+func startHTTPServer(address string, zsvVersions []string, zsvCLIsJson string) {
 	templates, err := template.ParseFS(templatesFS, "templates/index.html")
 	if err != nil {
 		log.Fatalf("failed to parse templates, %v", err)
@@ -104,12 +104,11 @@ func startHTTPServer(zsvVersions []string, zsvCLIsJson string) {
 
 	// start http server and wait for SIGINT
 
-	address := ":8080"
 	server := &http.Server{Addr: address}
 	go func() {
-		log.Printf("starting http server [graceful shutdown on SIGINT]")
+		log.Printf("starting http server on %v [graceful shutdown on SIGINT]", address)
 		if err := server.ListenAndServe(); err != nil {
-			log.Print(err)
+			log.Fatalf("failed to start HTTP server, error: %v", err)
 		}
 	}()
 
@@ -117,7 +116,7 @@ func startHTTPServer(zsvVersions []string, zsvCLIsJson string) {
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalf("failed to shutdown, error: %v", err)
