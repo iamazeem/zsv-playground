@@ -71,5 +71,7 @@ jobs:
         git fetch
         git checkout main
         git add version.go
-        git commit -m "[CI] Bump version to $VERSION"
-        git push -u origin main
+        if [[ $(git diff) != "" ]]; then
+          git commit -m "[CI] Bump version to $VERSION"
+          git push -u origin main
+        fi
