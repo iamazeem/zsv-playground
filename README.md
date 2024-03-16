@@ -1,11 +1,41 @@
 # zsv-playground
 
 [![ci](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-darkgreen.svg?style=flat-square)](https://github.com/iamAzeem/zsv-playground/blob/master/LICENSE)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)
+[![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange.svg?style=flat-square)](https://www.buymeacoffee.com/iamazeem)
 
-[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a PoC for
-[`zsv`](https://github.com/liquidaty/zsv).
+[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is an x64 Linux
+playground for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
 
-Currently, it is under active development and only works on Linux.
+Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
+
+> [!IMPORTANT]
+>
+> This is just a small [proof of
+> concept](https://en.wikipedia.org/wiki/Proof_of_concept) (PoC) and is only
+> meant to explore what is possible.
+
+## How it works
+
+- On startup, `zsv-playground` downloads and extracts the latest three `zsv`
+  [releases](https://github.com/liquidaty/zsv/releases) to `zsv` subdirectory on
+  the current path.
+- These downloaded `zsv` executables are used to serve the generated webpage in
+  the browser.
+- The user inputs the `CSV`, selects a command, chooses the required flags, and
+  hits `Run`.
+- The output is then shown under `Result`.
+
+## Limitations
+
+- Only global flags and main commands are supported now.
+- Some commands require multiple files or non-flag CLI arguments as input.
+  - This is currently not supported but may be added later.
+
+### Demo
+
+TODO: Add a demo GIF here!
 
 ## Download
 
@@ -20,56 +50,36 @@ Download the latest build from the
 
 Go to http://localhost:8080/ in your browser.
 
-## How it works
+Run `zsv-playground --help` to check the available CLI options.
 
-- `zsv-playground` aims to be a single static binary with everything bundled in
-  it.
-- By default, it uses the latest three `zsv`
-  [releases](https://github.com/liquidaty/zsv/releases). It does not build `zsv`
-  itself.
-  - These downloaded releases are extracted to a subdirectory named `zsv` on the
-    current path.
-  - Remove this directory manually if it's no longer needed.
-- These downloaded `zsv` versions are used to generate the HTML with the main
-  commands and their respective flags.
-- The user inputs the CSV, selects a command, chooses the required flags, and
-  hits `Run`.
-- The generated user CLI is run by the backend and the output is shown under
-  `Result`.
+## Development
 
-### Demo
+## Tech stack
 
-TODO: Add a demo GIF here!
+- [Go 1.21.4](https://go.dev/doc/install)
+- [Bootstrap v5.3.3](https://getbootstrap.com/)
+- [HTMX 1.9.10](https://htmx.org/)
 
 ## Build
 
-To build it locally:
+```shell
+git clone https://github.com/iamazeem/zsv-playground.git
+cd zsv-playground
+go build
+```
 
-- Set up the [Go](https://go.dev/doc/install) environment.
-  - Check [`go.mod`](./go.mod) file to check the required Go version.
-- Clone this project and `cd` into its directory.
-- Run `go build`.
+## Contribute
 
-> [!NOTE]
->
-> `zsv-playground` itself statically serves [Bootstrap
-> v5.3.3](https://getbootstrap.com/docs/5.3/getting-started/introduction/) (CSS
-> only) for UI, [HTMX v1.9.10](https://htmx.org/) to communicate with server,
-> and some JavaScript for input validation for a better UX. The only thing that
-> it downloads is `zsv`.
+Feedback is always welcome!
 
-## Limitations
+[Open an issue](https://github.com/iamazeem/zsv-playground/issues/new/choose) to
+report bugs or propose new features and enhancements.
 
-- This is just a small [PoC](https://en.wikipedia.org/wiki/Proof_of_concept)!
-- Not every command is supposed to work.
-  - Only global flags and the main commands are being supported now.
-  - The CLI differs from command to command and may not be fully supported.
-  - However, this PoC tries to converge most of them.
-- The basic input validation is supported but there is still room for
-  improvement.
-- Some commands require multiple files as input.
-  - This is currently not supported but may be added later.
-- To avoid duplicate runs, there is no caching at the moment.
+- [Fork](https://github.com/iamazeem/zsv-playground/fork) the project.
+- Check out the latest `main` branch.
+- Create a `feature` or `bugfix` branch.
+- Commit and push your changes.
+- Submit the PR.
 
 ## License
 
