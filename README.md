@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/iamazeem/zsv-playground/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-darkgreen.svg?style=flat-square)](https://github.com/iamAzeem/zsv-playground/blob/main/LICENSE)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)](https://github.com/iamazeem/zsv-playground/releases)
 [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange.svg?style=flat-square)](https://www.buymeacoffee.com/iamazeem)
 
 [`zsv-playground`](https://github.com/iamazeem/zsv-playground) is an x64 Linux
