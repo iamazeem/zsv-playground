@@ -27,15 +27,15 @@ Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
   hits `Run`.
 - The output is then shown under `Result`.
 
+### Demo
+
+TODO: Add a demo GIF here!
+
 ## Limitations
 
 - Only global flags and main commands are supported now.
 - Some commands require multiple files or non-flag CLI arguments as input.
   - This is currently not supported but may be added later.
-
-### Demo
-
-TODO: Add a demo GIF here!
 
 ## Download
 
@@ -54,13 +54,13 @@ Run `zsv-playground --help` to check the available CLI options.
 
 ## Development
 
-## Tech stack
+### Tech stack
 
 - [Go 1.21.4](https://go.dev/doc/install)
 - [Bootstrap v5.3.3](https://getbootstrap.com/)
 - [HTMX 1.9.10](https://htmx.org/)
 
-## Build
+### Build
 
 ```shell
 git clone https://github.com/iamazeem/zsv-playground.git
