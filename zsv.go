@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"log"
 	"os/exec"
 	"strings"
@@ -25,7 +26,7 @@ type ZsvCLI struct {
 // version -> CLI
 type ZsvCLIs map[string]ZsvCLI
 
-func loadCLIs(versions []string) (ZsvCLIs, bool) {
+func getCLIsJSON(versions []string) (string, bool) {
 	log.Printf("loading CLIs for all zsv versions %v", versions)
 
 	clis := ZsvCLIs{}
@@ -33,13 +34,19 @@ func loadCLIs(versions []string) (ZsvCLIs, bool) {
 		cli, ok := loadCLI(version)
 		if !ok {
 			log.Printf("failed to load CLI for zsv %v", version)
-			return nil, false
+			return "", false
 		}
 		clis[version] = cli
 	}
 
+	zsvCLIsJson, err := json.Marshal(clis)
+	if err != nil {
+		log.Printf("failed to marshal CLIs to JSON, error: %v", err)
+		return "", false
+	}
+
 	log.Printf("loaded CLIs for all zsv versions successfully")
-	return clis, true
+	return string(zsvCLIsJson), true
 }
 
 func loadCLI(version string) (ZsvCLI, bool) {

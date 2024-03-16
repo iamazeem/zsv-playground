@@ -191,6 +191,11 @@ func setupCache() ([]string, error) {
 		log.Printf("failed to clean cache")
 	}
 
+	log.Printf("cached zsv versions: %v", versions)
+
+	zsvExePaths := getExePaths(versions)
+	log.Printf("cached zsv binaries: %v", zsvExePaths)
+
 	log.Printf("set up zsv cache successfully")
 	return versions, nil
 }
