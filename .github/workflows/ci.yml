@@ -75,7 +75,7 @@ jobs:
       run: |
         git config user.name 'github-actions'
         git config user.email 'github-actions@github.com'
+        git fetch
         git add version.go
         git commit -m "[CI] Bump version to $VERSION"
-        git fetch
         git push -u origin main
