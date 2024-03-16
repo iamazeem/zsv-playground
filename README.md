@@ -29,7 +29,7 @@ Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
 
 ### Demo
 
-TODO: Add a demo GIF here!
+![demo](./demo/demo.gif)
 
 ## Limitations
 
