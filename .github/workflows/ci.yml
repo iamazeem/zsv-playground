@@ -55,7 +55,7 @@ jobs:
       env:
         GOOS: linux
         GOARCH: amd64
-      run: go build -v ./... -o zsv-playground-$VERSION-$GOOS-$GOARCH
+      run: go build -v -o zsv-playground-$VERSION-$GOOS-$GOARCH
 
     - name: Check
       run: ls -hl zsv-playground
