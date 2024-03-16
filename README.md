@@ -39,7 +39,7 @@ Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
 
 ## Download
 
-Download the latest build from the
+Download the latest binary from the
 [releases](https://github.com/iamazeem/zsv-playground/releases) page.
 
 ## Run
