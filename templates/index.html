@@ -190,7 +190,8 @@
       const form = document.getElementById('form');
       if (form) {
         form.addEventListener('htmx:sendError', function (event) {
-          const error = "[ERR] Server error! Make sure server is up and running!";
+          const timestamp = new Date().toISOString();
+          const error = timestamp + " [ERR] Server error! Make sure server is up and running!";
           console.error(error);
           document.getElementById('result').innerText = error;
         });

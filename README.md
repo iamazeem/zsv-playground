@@ -10,7 +10,7 @@ playground for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
 
 Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
 
-> [!IMPORTANT]
+> [!NOTE]
 >
 > This is just a small [proof of
 > concept](https://en.wikipedia.org/wiki/Proof_of_concept) (PoC) and is only
