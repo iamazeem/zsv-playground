@@ -166,6 +166,20 @@
       }
     }
 
+    function copyResult() {
+      var result = document.getElementById("result").innerText;
+      if (result !== "") {
+        result = result.replace(/\n\n\(elapsed time.*/, '');
+        if (result.length !== 0) {
+          navigator.clipboard.writeText(result);
+        }
+      }
+    }
+
+    function clearResult() {
+      document.getElementById("result").innerText = "";
+    }
+
     // htmx.logger = function (elt, event, data) {
     //   if (console) {
     //     console.log(event, elt, data);
@@ -239,6 +253,13 @@
         </div>
         <div class="col-6">
           <label for="result" class="form-label">Result</label>
+          <span>
+            <button id="copy" class="btn btn-outline-secondary btn-sm" type="button"
+              style="width: auto; padding: 0px 5px 0px 5px; float: right;" onclick="clearResult();">clear</button>
+            <button id="copy" class="btn btn-outline-secondary btn-sm" type="button"
+              style="width: auto; padding: 0px 5px 0px 5px; float: right; margin-right: 5px;"
+              onclick="copyResult();">copy</button>
+          </span>
           <pre id="result" class="form-control bg-light overflow-auto" style="height: 400px; resize: none;"></pre>
         </div>
       </div>
