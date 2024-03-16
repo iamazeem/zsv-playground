@@ -5,14 +5,14 @@ on:
     branches: [main]
     paths-ignore:
     - "**.md"
-    - ".vscode"
-    - "site"
+    - ".vscode/**"
+    - "site/**"
   pull_request:
     branches: [main]
     paths-ignore:
     - "**.md"
-    - ".vscode"
-    - "site"
+    - ".vscode/**"
+    - "site/**"
   release:
     types: [published]
   workflow_dispatch:
