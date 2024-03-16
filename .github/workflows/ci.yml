@@ -55,7 +55,7 @@ jobs:
       env:
         GOOS: linux
         GOARCH: amd64
-      run: go build -v -x -o zsv-playground-$VERSION-$GOOS-$GOARCH
+      run: go build -v -x -ldflags '-w -s' -o zsv-playground-$VERSION-$GOOS-$GOARCH
 
     - name: Upload
       uses: actions/upload-artifact@v4
