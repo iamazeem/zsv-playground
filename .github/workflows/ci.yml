@@ -37,36 +37,44 @@ jobs:
         sed "s|version = \"v.*\"|version = \"$VERSION\"|" -i version.go
         cat -n version.go
 
-    - name: Set VERSION env var
+    - name: Set VERSION, EXE, and ZIP env vars
       run: |
+        VERSION=""
         if [[ $GITHUB_REF == "refs/tags/v"* ]]; then
-          echo "VERSION=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+          VERSION="$GITHUB_REF_NAME"
         else
-          echo "VERSION=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+          VERSION="${GITHUB_SHA::7}"
         fi
+        EXE="zsv-playground-$VERSION-linux-amd64"
+        ZIP="$EXE.zip"
+        {
+          echo "VERSION=$VERSION"
+          echo "EXE=$EXE"
+          echo "ZIP=$ZIP"
+        } | tee -a "$GITHUB_ENV"
 
     - name: Build (linux/amd64)
       run: |
-        GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "zsv-playground-$VERSION-linux-amd64"
-        zip "zsv-playground-$VERSION-linux-amd64.zip" "zsv-playground-$VERSION-linux-amd64"
+        GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
+        zip "$EXE.zip" "$EXE"
 
-    - name: Upload
+    - name: Upload build artifact [${{ env.ZIP }}]
       uses: actions/upload-artifact@v4
       with:
-        name: zsv-playground-${{ env.VERSION }}-linux-amd64
-        path: zsv-playground-${{ env.VERSION }}-linux-amd64
+        name: '${{ env.ZIP }}'
+        path: '${{ env.ZIP }}'
         if-no-files-found: error
 
-    - name: Upload with release
+    - name: Upload with release [${{ env.ZIP }}]
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/v')
       with:
-        files: zsv-playground-${{ env.VERSION }}-linux-amd64.zip
+        files: '${{ env.ZIP }}'
 
-    - name: Bump version [${{ env.VERSION }}]
+    - name: Bump version on release [${{ env.VERSION }}]
       if: startsWith(github.ref, 'refs/tags/v')
       run: |
-        git config user.name 'github-actions'
+        git config user.name 'github-actions[bot]'
         git config user.email 'github-actions@github.com'
         git fetch
         git checkout main
