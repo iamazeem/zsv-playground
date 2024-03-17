@@ -30,33 +30,26 @@ jobs:
 
     - name: Get tag and set version on release
       if: startsWith(github.ref, 'refs/tags/v')
-      env:
-        VERSION: '${{ github.ref_name }}'
       run: |
-        echo "VERSION: $VERSION"
-        sed "s|version = \"v.*\"|version = \"$VERSION\"|" -i version.go
+        sed "s|version = \"v.*\"|version = \"$GITHUB_REF_NAME\"|" -i version.go
         cat -n version.go
 
     - name: Set VERSION, EXE, and ZIP env vars
       run: |
-        VERSION=""
-        if [[ $GITHUB_REF == "refs/tags/v"* ]]; then
-          VERSION="$GITHUB_REF_NAME"
-        else
+        VERSION="$GITHUB_REF_NAME"
+        if [[ $GITHUB_REF != "refs/tags/v"* ]]; then
           VERSION="${GITHUB_SHA::7}"
         fi
-        EXE="zsv-playground-$VERSION-linux-amd64"
-        ZIP="$EXE.zip"
         {
           echo "VERSION=$VERSION"
-          echo "EXE=$EXE"
-          echo "ZIP=$ZIP"
+          echo "EXE=zsv-playground-$VERSION-linux-amd64"
+          echo "ZIP=$EXE.zip"
         } | tee -a "$GITHUB_ENV"
 
     - name: Build (linux/amd64)
       run: |
         GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
-        zip "$EXE.zip" "$EXE"
+        zip "$ZIP" "$EXE"
 
     - name: Upload build artifact [${{ env.ZIP }}]
       uses: actions/upload-artifact@v4
