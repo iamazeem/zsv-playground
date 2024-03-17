@@ -34,6 +34,7 @@ Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
 ## Limitations
 
 - Only global flags and main commands are supported now.
+  - Other commands are not supported.
 - Some commands require multiple files or non-flag CLI arguments as input.
   - This is currently not supported but may be added later.
 
@@ -57,7 +58,7 @@ Run `zsv-playground --help` to check the available CLI options.
 ### Tech stack
 
 - [Go 1.21.4](https://go.dev/doc/install)
-- [Bootstrap v5.3.3](https://getbootstrap.com/)
+- [Bootstrap 5.3.3](https://getbootstrap.com/)
 - [HTMX 1.9.10](https://htmx.org/)
 
 ### Build
