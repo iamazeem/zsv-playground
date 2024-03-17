@@ -40,10 +40,12 @@ jobs:
         if [[ $GITHUB_REF != "refs/tags/v"* ]]; then
           VERSION="${GITHUB_SHA::7}"
         fi
+        EXE="zsv-playground-$VERSION-linux-amd64"
+        ZIP="$EXE.zip"
         {
           echo "VERSION=$VERSION"
-          echo "EXE=zsv-playground-$VERSION-linux-amd64"
-          echo "ZIP=$EXE.zip"
+          echo "EXE=$EXE"
+          echo "ZIP=$ZIP"
         } | tee -a "$GITHUB_ENV"
 
     - name: Build (linux/amd64)
