@@ -69,6 +69,20 @@ cd zsv-playground
 go build
 ```
 
+### Docker
+
+Build:
+
+```shell
+docker build -t zsv-playground .
+```
+
+Run:
+
+```shell
+docker run -p 8080:8080 zsv-playground
+```
+
 ## Contribute
 
 Feedback is always welcome!
