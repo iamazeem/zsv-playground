@@ -44,10 +44,10 @@ jobs:
 
     - name: Build
       run: |
-        for OS in linux, windows, darwin, freebsd; do
+        for OS in linux windows darwin freebsd; do
           EXE="zsv-playground-$VERSION-amd64-$OS"
+          GOOS=linux GOARCH=amd64 go build -ldflags '-w -s' -o "$EXE"
           ZIP="$EXE.zip"
-          GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
           zip "$ZIP" "$EXE"
           echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=$ZIP" | tee -a "$GITHUB_ENV"
         done
