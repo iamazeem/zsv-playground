@@ -271,7 +271,7 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 }
 
 func getExePath(version string) string {
-	return fmt.Sprintf("%v/%v/%v/bin/zsv", cacheDir, version, getTriplet())
+	return filepath.Join(cacheDir, version, getTriplet(), "bin", "zsv")
 }
 
 func getExePaths(versions []string) []string {
