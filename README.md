@@ -8,7 +8,7 @@
 [`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a playground
 for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
 
-It is available for x64 Linux, Windows, MacOS, and FreeBSD.
+It is available for AMD64 Linux, MacOS, and FreeBSD.
 
 > [!NOTE]
 >

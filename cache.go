@@ -25,8 +25,6 @@ func getTriplet() string {
 	switch runtime.GOOS {
 	case "linux":
 		return "amd64-linux-gcc"
-	case "windows":
-		return "amd64-windows-mingw"
 	case "darwin":
 		return "amd64-macosx-gcc"
 	case "freebsd":
@@ -245,7 +243,7 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 		}
 
 		// extract binary only i.e. .../bin/zsv
-		if !strings.HasSuffix(header.Name, "bin/") && !strings.HasSuffix(header.Name, "/bin/zsv") && !strings.HasSuffix(header.Name, "/bin/zsv.exe") {
+		if !strings.HasSuffix(header.Name, "bin/") && !strings.HasSuffix(header.Name, "/bin/zsv") {
 			continue
 		}
 

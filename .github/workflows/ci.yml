@@ -44,11 +44,8 @@ jobs:
 
     - name: Build
       run: |
-        for OS in linux windows darwin freebsd; do
+        for OS in linux darwin freebsd; do
           EXE="zsv-playground-$VERSION-amd64-$OS"
-          if [[ $OS == 'windows' ]]; then
-            EXE="$EXE.exe"
-          fi
           GOOS="$OS" GOARCH=amd64 go build -ldflags '-w -s' -o "$EXE"
           ZIP="$EXE.zip"
           zip "$ZIP" "$EXE"
@@ -62,13 +59,6 @@ jobs:
       with:
         name: ${{ env.LINUX_ZIP }}
         path: ${{ env.LINUX_ZIP }}
-        if-no-files-found: error
-
-    - name: Upload ${{ env.WINDOWS_ZIP }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.WINDOWS_ZIP }}
-        path: ${{ env.WINDOWS_ZIP }}
         if-no-files-found: error
 
     - name: Upload ${{ env.DARWIN_ZIP }}
@@ -91,7 +81,6 @@ jobs:
       with:
         files: |
           ${{ env.LINUX_ZIP }}
-          ${{ env.WINDOWS_ZIP }}
           ${{ env.DARWIN_ZIP }}
           ${{ env.FREEBSD_ZIP }}
 

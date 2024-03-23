@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -76,12 +75,7 @@ func startHTTPServer(address string, zsvVersions []string, zsvCLIsJson string) {
 
 		start := time.Now()
 
-		var cmd *exec.Cmd
-		if runtime.GOOS == "windows" {
-			cmd = exec.Command("cmd", "/C", cli)
-		} else {
-			cmd = exec.Command("sh", "-c", cli)
-		}
+		cmd := exec.Command("sh", "-c", cli)
 		cmd.Stdin = strings.NewReader(csv)
 		output, err := cmd.CombinedOutput()
 
