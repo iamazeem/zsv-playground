@@ -32,7 +32,7 @@ func getTriplet() string {
 	case "freebsd":
 		return "amd64-freebsd-gcc"
 	default:
-		log.Fatalf("%v not supported", runtime.GOOS)
+		log.Printf("%v not supported", runtime.GOOS)
 		return ""
 	}
 }
