@@ -245,7 +245,7 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 		}
 
 		// extract binary only i.e. .../bin/zsv
-		if !strings.HasSuffix(header.Name, "bin/") && !strings.HasSuffix(header.Name, "/bin/zsv") {
+		if !strings.HasSuffix(header.Name, "bin/") && !strings.HasSuffix(header.Name, "/bin/zsv") && !strings.HasSuffix(header.Name, "/bin/zsv.exe") {
 			continue
 		}
 
