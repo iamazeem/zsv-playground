@@ -13,6 +13,11 @@ on:
 
 permissions:
   contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   ci:
@@ -97,3 +102,21 @@ jobs:
           git commit -m "[CI] Bump version to $VERSION"
           git push -u origin main
         fi
+
+    # --- docker ---
+
+    - name: Log in to the Container registry [${{ env.REGISTRY }}]
+      if: ${{ github.event_name != 'pull_request' }}
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image [${{ env.VERSION }}]
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ env.VERSION }}
+        labels: linux/amd64
