@@ -46,6 +46,7 @@ jobs:
       run: |
         for OS in linux, windows, darwin, freebsd; do
           EXE="zsv-playground-$VERSION-amd64-$OS"
+          ZIP="$EXE.zip"
           GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
           zip "$ZIP" "$EXE"
           echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=" | tee -a "$GITHUB_ENV"
