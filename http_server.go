@@ -106,7 +106,7 @@ func startHTTPServer(address string, zsvVersions []string, zsvCLIsJson string) {
 
 	server := &http.Server{Addr: address}
 	go func() {
-		log.Printf("starting http server on %v [graceful shutdown on SIGINT]", address)
+		log.Printf("starting http server on %v [press CTRL+C for graceful shutdown]", address)
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatalf("failed to start HTTP server, error: %v", err)
 		}
