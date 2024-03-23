@@ -46,11 +46,12 @@ jobs:
       run: |
         for OS in linux windows darwin freebsd; do
           EXE="zsv-playground-$VERSION-amd64-$OS"
-          GOOS=linux GOARCH=amd64 go build -ldflags '-w -s' -o "$EXE"
+          GOOS="$OS" GOARCH=amd64 go build -ldflags -v '-w -s' -o "$EXE"
           ZIP="$EXE.zip"
           zip "$ZIP" "$EXE"
           echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=$ZIP" | tee -a "$GITHUB_ENV"
         done
+        file zsv-playground*
         ls -hl *.zip
 
     - name: Upload [${{ env.LINUX_ZIP }}]
