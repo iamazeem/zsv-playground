@@ -46,6 +46,9 @@ jobs:
       run: |
         for OS in linux windows darwin freebsd; do
           EXE="zsv-playground-$VERSION-amd64-$OS"
+          if [[ $OS == 'windows' ]]; then
+            EXE="$EXE.exe"
+          fi
           GOOS="$OS" GOARCH=amd64 go build -ldflags '-w -s' -o "$EXE"
           ZIP="$EXE.zip"
           zip "$ZIP" "$EXE"
