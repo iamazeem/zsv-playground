@@ -40,31 +40,55 @@ jobs:
         if [[ $GITHUB_REF != "refs/tags/v"* ]]; then
           VERSION="${GITHUB_SHA::7}"
         fi
-        EXE="zsv-playground-$VERSION-linux-amd64"
-        ZIP="$EXE.zip"
-        {
-          echo "VERSION=$VERSION"
-          echo "EXE=$EXE"
-          echo "ZIP=$ZIP"
-        } | tee -a "$GITHUB_ENV"
+        echo "VERSION=$VERSION" | tee -a "$GITHUB_ENV"
 
-    - name: Build (linux/amd64)
+    - name: Build
       run: |
-        GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
-        zip "$ZIP" "$EXE"
+        for OS in linux, windows, darwin, freebsd; do
+          EXE="zsv-playground-$VERSION-amd64-$OS"
+          GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
+          zip "$ZIP" "$EXE"
+          echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=" | tee -a "$GITHUB_ENV"
+        done
+        ls -hl *.zip
 
-    - name: Upload build artifact [${{ env.ZIP }}]
+    - name: Upload [${{ env.LINUX_ZIP }}]
       uses: actions/upload-artifact@v4
       with:
-        name: '${{ env.ZIP }}'
-        path: '${{ env.ZIP }}'
+        name: ${{ env.LINUX_ZIP }}
+        path: ${{ env.LINUX_ZIP }}
         if-no-files-found: error
 
-    - name: Upload with release [${{ env.ZIP }}]
+    - name: Upload ${{ env.WINDOWS_ZIP }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.WINDOWS_ZIP }}
+        path: ${{ env.WINDOWS_ZIP }}
+        if-no-files-found: error
+
+    - name: Upload ${{ env.DARWIN_ZIP }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.DARWIN_ZIP }}
+        path: ${{ env.DARWIN_ZIP }}
+        if-no-files-found: error
+
+    - name: Upload ${{ env.FREEBSD_ZIP }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.FREEBSD_ZIP }}
+        path: ${{ env.FREEBSD_ZIP }}
+        if-no-files-found: error
+
+    - name: Upload with release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/v')
       with:
-        files: '${{ env.ZIP }}'
+        files: |
+          ${{ env.LINUX_ZIP }}
+          ${{ env.WINDOWS_ZIP }}
+          ${{ env.DARWIN_ZIP }}
+          ${{ env.FREEBSD_ZIP }}
 
     - name: Bump version on release [${{ env.VERSION }}]
       if: startsWith(github.ref, 'refs/tags/v')

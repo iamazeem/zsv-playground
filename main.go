@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"runtime"
 )
 
 func init() {
@@ -20,7 +21,7 @@ func main() {
 		return
 	}
 
-	log.Printf("starting zsv playground [%v]", version)
+	log.Printf("starting zsv-playground %v [os: %v, arch: %v]", version, runtime.GOOS, runtime.GOARCH)
 
 	zsvVersions, err := setupCache()
 	if err != nil {
