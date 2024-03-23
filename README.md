@@ -5,10 +5,10 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)](https://github.com/iamazeem/zsv-playground/releases)
 [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange.svg?style=flat-square)](https://www.buymeacoffee.com/iamazeem)
 
-[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is an playground
+[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a playground
 for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
 
-Available for x64 Linux, Windows, MacOS, and FreeBSD.
+It is available for x64 Linux, Windows, MacOS, and FreeBSD.
 
 > [!NOTE]
 >
@@ -40,7 +40,7 @@ Available for x64 Linux, Windows, MacOS, and FreeBSD.
 
 ## Download
 
-Download the latest binary from the
+Download the latest binaries from the
 [releases](https://github.com/iamazeem/zsv-playground/releases) page.
 
 ## Run
