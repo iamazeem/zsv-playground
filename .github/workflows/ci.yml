@@ -49,7 +49,7 @@ jobs:
           ZIP="$EXE.zip"
           GOOS=linux GOARCH=amd64 go build -v -x -ldflags '-w -s' -o "$EXE"
           zip "$ZIP" "$EXE"
-          echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=" | tee -a "$GITHUB_ENV"
+          echo "$(echo $OS | tr [:lower:] [:upper:])_ZIP=$ZIP" | tee -a "$GITHUB_ENV"
         done
         ls -hl *.zip
 
