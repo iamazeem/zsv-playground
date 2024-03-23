@@ -17,8 +17,6 @@ import (
 )
 
 const (
-	owner    = "liquidaty"
-	repo     = "zsv"
 	archive  = "tar.gz"
 	cacheDir = "zsv"
 )
@@ -139,6 +137,9 @@ func setupCache() ([]string, error) {
 	if !ok {
 		return nil, fmt.Errorf("failed to load cache")
 	}
+
+	owner := "liquidaty"
+	repo := "zsv"
 
 	ctx := context.Background()
 	client := github.NewClient(nil)
