@@ -10,10 +10,30 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/google/go-github/v60/github"
 )
+
+const (
+	archive  = "tar.gz"
+	cacheDir = "zsv"
+)
+
+func getTriplet() string {
+	switch runtime.GOOS {
+	case "linux":
+		return "amd64-linux-gcc"
+	case "darwin":
+		return "amd64-macosx-gcc"
+	case "freebsd":
+		return "amd64-freebsd-gcc"
+	default:
+		log.Printf("%v not supported", runtime.GOOS)
+		return ""
+	}
+}
 
 func initCache() bool {
 	log.Println("initializing cache")
@@ -116,6 +136,9 @@ func setupCache() ([]string, error) {
 		return nil, fmt.Errorf("failed to load cache")
 	}
 
+	owner := "liquidaty"
+	repo := "zsv"
+
 	ctx := context.Background()
 	client := github.NewClient(nil)
 	opts := &github.ListOptions{Page: 1, PerPage: 3}
@@ -133,6 +156,7 @@ func setupCache() ([]string, error) {
 	// tag > id
 	m := map[string]int64{}
 
+	suffix := getTriplet() + "." + archive
 	for _, r := range releases {
 		tag := r.GetTagName()
 		versions = append(versions, tag)
@@ -245,7 +269,7 @@ func untarZsvTarGz(targetDir string, r io.Reader) error {
 }
 
 func getExePath(version string) string {
-	return fmt.Sprintf("%v/%v/%v/bin/zsv", cacheDir, version, triplet)
+	return filepath.Join(cacheDir, version, getTriplet(), "bin", "zsv")
 }
 
 func getExePaths(versions []string) []string {

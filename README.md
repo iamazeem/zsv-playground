@@ -5,10 +5,10 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)](https://github.com/iamazeem/zsv-playground/releases)
 [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange.svg?style=flat-square)](https://www.buymeacoffee.com/iamazeem)
 
-[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is an x64 Linux
-playground for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
+[`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a playground
+for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
 
-Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
+It is available for AMD64 Linux, MacOS, and FreeBSD.
 
 > [!NOTE]
 >
@@ -40,7 +40,7 @@ Locally tested on Ubuntu 22.04 LTS with Chrome 122.0.6261.128.
 
 ## Download
 
-Download the latest binary from the
+Download the latest binaries from the
 [releases](https://github.com/iamazeem/zsv-playground/releases) page.
 
 ## Run
