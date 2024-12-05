@@ -5,15 +5,17 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/iamAzeem/zsv-playground?style=flat-square)](https://github.com/iamazeem/zsv-playground/releases)
 
 [`zsv-playground`](https://github.com/iamazeem/zsv-playground) is a playground
-for [`zsv`](https://github.com/liquidaty/zsv) CLI executable.
+for [`zsv`](https://github.com/liquidaty/zsv) CLI executable for AMD64 Linux,
+MacOS, and FreeBSD.
 
-It is available for AMD64 Linux, MacOS, and FreeBSD.
-
-> [!NOTE]
+> [!IMPORTANT]
 >
 > This is just a small [proof of
 > concept](https://en.wikipedia.org/wiki/Proof_of_concept) (PoC) and is only
 > meant to explore what is possible.
+>
+> Visit the official `zsv` playground instead:
+> <https://liquidaty.github.io/zsv>.
 
 ## How it works
 
